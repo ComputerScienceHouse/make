@@ -18,7 +18,7 @@ func getAllAreas(c *gin.Context) {
 
 	defer rows.Close()
 
-	var areas []models.Area
+	var areas []models.Area = []models.Area{}
 
 	for rows.Next() {
 		var area models.Area
