@@ -73,7 +73,7 @@ func main() {
 	frontend.Use(auth.CookieMiddleware())
 
 	if os.Getenv("DEV") == "true" {
-		router.NoRoute(createViteProxy())
+		router.NoRoute(auth.CookieMiddleware(), createViteProxy())
 	} else {
 		frontend.Static("/assets", "./web/dist/assets")
 		frontend.GET("/", serveIndex)
