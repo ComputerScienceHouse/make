@@ -7,7 +7,6 @@ interface Props {
 }
 
 const user = authState.user
-console.log(user)
 
 const props = defineProps<Props>()
 </script>
