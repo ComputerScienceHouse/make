@@ -8,9 +8,23 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// for browser -> header auth api endpoint,
+// moves the JWT from cookie to request header
+func cookieToAuthHeader() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		cookie, err := c.Cookie("Auth")
+		if err == nil && cookie != "" {
+			c.Request.Header.Set("Authorization", "Bearer "+cookie)
+		}
+
+		c.Next()
+	}
+}
+
 func SetRoutes(router *gin.Engine, auth csh_auth.Auth) {
 	api := router.Group("/api")
-	api.Use(auth.CookieMiddleware())
+	api.Use(cookieToAuthHeader())
+	api.Use(auth.HeaderMiddleware())
 	areas.Routes(api)
 	me.Routes(api)
 }
