@@ -3,11 +3,18 @@ package database
 import (
 	"database/sql"
 	"log"
+	"makedotcsh/models"
 
 	_ "github.com/mattn/go-sqlite3"
 )
 
 var DB *sql.DB
+
+type DatabaseHelper struct {
+	DB *sql.DB
+}
+
+var Helper *DatabaseHelper
 
 func Init() {
 	var err error
@@ -26,4 +33,68 @@ func Init() {
 	if err != nil {
 		log.Fatal(err)
 	}
+
+	Helper = &DatabaseHelper{DB: DB}
+}
+
+func (database *DatabaseHelper) GetArea(areaID int) (models.Area, error) {
+	row := database.DB.QueryRow("SELECT id, name, description, photourl FROM areas WHERE id = ?", areaID)
+
+	var area models.Area
+
+	err := row.Scan(
+		&area.ID,
+		&area.Name,
+		&area.Description,
+		&area.PhotoURL,
+	)
+
+	if err != nil {
+		return models.Area{}, err
+	}
+
+	return area, nil
+}
+
+func (database *DatabaseHelper) GetAllAreas() ([]models.Area, error) {
+	rows, err := database.DB.Query("SELECT id, name, description, photourl FROM areas")
+
+	var areas []models.Area
+
+	for rows.Next() {
+		var area models.Area
+
+		err := rows.Scan(
+			&area.ID,
+			&area.Name,
+			&area.Description,
+			&area.PhotoURL,
+		)
+
+		if err != nil {
+			return []models.Area{}, nil
+		}
+
+		areas = append(areas, area)
+	}
+	if err != nil {
+		return []models.Area{}, err
+	}
+
+	return areas, nil
+}
+
+func (database *DatabaseHelper) CreateArea(area models.CreateAreaRequest) error {
+	_, err := database.DB.Exec(
+		"INSERT INTO areas (name, description, photourl) VALUES (?, ?, ?)",
+		area.Name,
+		area.Description,
+		area.PhotoURL,
+	)
+
+	if err != nil {
+		return err
+	}
+
+	return nil
 }

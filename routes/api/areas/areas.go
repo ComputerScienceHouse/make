@@ -5,53 +5,25 @@ import (
 	"errors"
 	"makedotcsh/database"
 	"makedotcsh/models"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 )
 
 func getAllAreas(c *gin.Context) {
-	rows, err := database.DB.Query("SELECT id, name, description, photourl FROM areas")
+	areas, err := database.Helper.GetAllAreas()
 	if err != nil {
 		c.Error(err)
 		return
-	}
-
-	defer rows.Close()
-
-	var areas []models.Area = []models.Area{}
-
-	for rows.Next() {
-		var area models.Area
-
-		err := rows.Scan(
-			&area.ID,
-			&area.Name,
-			&area.Description,
-			&area.PhotoURL,
-		)
-
-		if err != nil {
-			c.Error(err)
-			return
-		}
-
-		areas = append(areas, area)
 	}
 
 	c.JSON(200, areas)
 }
 
 func getArea(c *gin.Context) {
-	row := database.DB.QueryRow("SELECT id, name, description, photourl FROM areas WHERE id = ?", c.Param("id"))
+	id, err := strconv.Atoi(c.Param("id"))
 
-	var area models.Area
-
-	err := row.Scan(
-		&area.ID,
-		&area.Name,
-		&area.Description,
-		&area.PhotoURL,
-	)
+	area, err := database.Helper.GetArea(id)
 
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
@@ -77,12 +49,7 @@ func createArea(c *gin.Context) {
 		return
 	}
 
-	_, err = database.DB.Exec(
-		"INSERT INTO areas (name, description, photourl) VALUES (?, ?, ?)",
-		req.Name,
-		req.Description,
-		req.PhotoURL,
-	)
+	err = database.Helper.CreateArea(req)
 	if err != nil {
 		c.Error(err)
 		return
