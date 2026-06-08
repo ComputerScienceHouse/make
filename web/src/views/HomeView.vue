@@ -24,8 +24,7 @@ function openArea(id: number) {
     <h1>Welcome to MAKE</h1>
 
     <p>
-      Your central hub for training and resources for
-      CSH's workshops and special-use spaces.
+      The central hub for training and resources for CSH's special-use rooms.
     </p>
     <h1>Profile</h1>
 
