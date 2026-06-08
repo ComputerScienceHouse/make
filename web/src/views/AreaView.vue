@@ -1,12 +1,7 @@
 <script setup lang="ts">
+import type { Area } from "@/models/areas";
 import { ref, onMounted } from "vue";
 import { useRoute } from "vue-router";
-
-interface Area {
-    id: number;
-    name: string;
-    description: string;
-}
 
 const area = ref<Area | null>(null);
 const loading = ref(true);
@@ -42,7 +37,7 @@ onMounted(async () => {
 
     <main class="container py-4" v-else-if="area">
         <div class="position-relative rounded overflow-hidden mb-4" style="height: 280px;">
-            <img src="https://i.kym-cdn.com/photos/images/newsfeed/002/720/384/928.jpeg" :alt="area.name"
+            <img :src="area.photourl" :alt="area.name"
                 class="w-100 h-100 object-fit-cover" />
 
             <div class="position-absolute top-0 start-0 w-100 h-100 image-gradient"></div>

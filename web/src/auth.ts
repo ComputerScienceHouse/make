@@ -14,16 +14,22 @@ export const authState = reactive({
 
 export async function loadUser() {
 
-    const res = await fetch("/api/me", {
-        credentials: "include",
-    });
+    try {
+        const res = await fetch("/api/me", {
+            credentials: "include",
+        });
 
-    if (!res.ok) {
-        authState.user = null;
-        return;
+        if (!res.ok) {
+            authState.user = null;
+            return;
+        }
+
+        authState.user = await res.json();
+    } catch {
+        
     }
 
-    authState.user = await res.json();
+
 
 }
 

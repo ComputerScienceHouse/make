@@ -10,7 +10,7 @@ import (
 )
 
 func getAllAreas(c *gin.Context) {
-	rows, err := database.DB.Query("SELECT id, name, description FROM areas")
+	rows, err := database.DB.Query("SELECT id, name, description, photourl FROM areas")
 	if err != nil {
 		c.Error(err)
 		return
@@ -27,6 +27,7 @@ func getAllAreas(c *gin.Context) {
 			&area.ID,
 			&area.Name,
 			&area.Description,
+			&area.PhotoURL,
 		)
 
 		if err != nil {
@@ -41,7 +42,7 @@ func getAllAreas(c *gin.Context) {
 }
 
 func getArea(c *gin.Context) {
-	row := database.DB.QueryRow("SELECT id, name, description FROM areas WHERE id = ?", c.Param("id"))
+	row := database.DB.QueryRow("SELECT id, name, description, photourl FROM areas WHERE id = ?", c.Param("id"))
 
 	var area models.Area
 
@@ -49,6 +50,7 @@ func getArea(c *gin.Context) {
 		&area.ID,
 		&area.Name,
 		&area.Description,
+		&area.PhotoURL,
 	)
 
 	if err != nil {
@@ -76,9 +78,10 @@ func createArea(c *gin.Context) {
 	}
 
 	_, err = database.DB.Exec(
-		"INSERT INTO areas (name, description) VALUES (?, ?)",
+		"INSERT INTO areas (name, description, photourl) VALUES (?, ?, ?)",
 		req.Name,
 		req.Description,
+		req.PhotoURL,
 	)
 	if err != nil {
 		c.Error(err)

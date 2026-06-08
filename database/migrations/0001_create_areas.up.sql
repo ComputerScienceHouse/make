@@ -1,5 +1,6 @@
 CREATE TABLE areas (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     name TEXT NOT NULL,
-    description TEXT
+    description TEXT,
+    photourl TEXT
 );
