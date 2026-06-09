@@ -6,3 +6,9 @@ type Training struct {
 	Description string `json:"description"`
 	Questions   any    `json:"questions"`
 }
+
+type CreateTrainingRequest struct {
+	Title       string `json:"title"`
+	Description string `json:"description"`
+	Questions   any    `json:"questions"`
+}

@@ -58,6 +58,9 @@ func (database *DatabaseHelper) GetArea(areaID int) (models.Area, error) {
 
 func (database *DatabaseHelper) GetAllAreas() ([]models.Area, error) {
 	rows, err := database.DB.Query("SELECT id, name, description, photourl FROM areas")
+	if err != nil {
+		return []models.Area{}, nil
+	}
 
 	var areas []models.Area
 
@@ -120,6 +123,9 @@ func (database *DatabaseHelper) GetTraining(trainingID int) (models.Training, er
 
 func (database *DatabaseHelper) GetAllTrainings() ([]models.Training, error) {
 	rows, err := database.DB.Query("SELECT id, title, description, questions FROM trainings")
+	if err != nil {
+		return []models.Training{}, nil
+	}
 
 	var trainings []models.Training
 
@@ -146,9 +152,9 @@ func (database *DatabaseHelper) GetAllTrainings() ([]models.Training, error) {
 	return trainings, nil
 }
 
-func (database *DatabaseHelper) CreateTraining(training models.Training) error {
+func (database *DatabaseHelper) CreateTraining(training models.CreateTrainingRequest) error {
 	_, err := database.DB.Exec(
-		"INSERT INTO trainings (title, description, question) VALUES (?, ?, ?)",
+		"INSERT INTO trainings (title, description, questions) VALUES (?, ?, ?)",
 		training.Title,
 		training.Description,
 		training.Questions,
@@ -159,4 +165,40 @@ func (database *DatabaseHelper) CreateTraining(training models.Training) error {
 	}
 
 	return nil
+}
+
+type dbAreaTraining struct {
+	areaID     int
+	trainingID int
+}
+
+func (database *DatabaseHelper) GetAreaTrainings(area int) ([]models.Training, error) {
+	rows, err := database.DB.Query("SELECT training_id FROM area_trainings WHERE area_id = ?", area)
+	if err != nil {
+		return []models.Training{}, nil
+	}
+
+	var trainings []models.Training = []models.Training{}
+
+	for rows.Next() {
+		var trainingID int
+
+		err := rows.Scan(
+			&trainingID,
+		)
+
+		if err != nil {
+			return []models.Training{}, err
+		}
+
+		// fetch this training, add to array
+		training, err := database.GetTraining(trainingID)
+		if err != nil {
+			return []models.Training{}, err
+		}
+
+		trainings = append(trainings, training)
+	}
+
+	return trainings, nil
 }

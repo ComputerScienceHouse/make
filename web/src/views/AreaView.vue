@@ -1,9 +1,11 @@
 <script setup lang="ts">
 import type { Area } from "@/models/areas";
+import type { Training } from "@/models/trainings";
 import { ref, onMounted } from "vue";
 import { useRoute } from "vue-router";
 
 const area = ref<Area | null>(null);
+const trainings = ref<Training[] | null>(null);
 const loading = ref(true);
 const notFound = ref(false);
 
@@ -11,17 +13,22 @@ const route = useRoute();
 
 onMounted(async () => {
     try {
-        const response = await fetch(
-            `/api/areas/${route.params.id}`
-        );
 
-        if (response.ok) {
-            area.value = await response.json();
-        } else if (response.status === 404) {
+        const [areaRes, trainingsRes] = await Promise.all([
+            fetch(`/api/areas/${route.params.id}`),
+            fetch(`/api/trainings/area/${route.params.id}`),
+        ])
+
+        if (areaRes.status === 404) {
             notFound.value = true;
-        } else {
-            throw new Error("Failed to fetch area");
         }
+
+        if (!areaRes.ok || !trainingsRes.ok) {
+            throw new Error("Failed to fetch data");
+        }
+
+        area.value = await areaRes.json()
+        trainings.value = await trainingsRes.json()
     } catch (err) {
         console.error(err);
     } finally {
@@ -37,8 +44,7 @@ onMounted(async () => {
 
     <main class="container py-4" v-else-if="area">
         <div class="position-relative rounded overflow-hidden mb-4" style="height: 280px;">
-            <img :src="area.photourl" :alt="area.name"
-                class="w-100 h-100 object-fit-cover" />
+            <img :src="area.photourl" :alt="area.name" class="w-100 h-100 object-fit-cover" />
 
             <div class="position-absolute top-0 start-0 w-100 h-100 image-gradient"></div>
 
@@ -77,15 +83,8 @@ onMounted(async () => {
                         </h5>
 
                         <ul class="list-group list-group-flush">
-                            <li class="list-group-item d-flex justify-content-between">
-                                general shit
-                                <span class="badge text-bg-success">
-                                    Complete
-                                </span>
-                            </li>
-
-                            <li class="list-group-item d-flex justify-content-between">
-                                lab shit
+                            <li v-for="training in trainings" class="list-group-item d-flex justify-content-between">
+                                {{ training.title }}
                                 <span class="badge text-bg-success">
                                     Complete
                                 </span>

@@ -3,6 +3,7 @@ package routes
 import (
 	"makedotcsh/routes/api/areas"
 	"makedotcsh/routes/api/me"
+	"makedotcsh/routes/api/trainings"
 
 	csh_auth "github.com/computersciencehouse/csh-auth/v2"
 	"github.com/gin-gonic/gin"
@@ -25,6 +26,9 @@ func SetRoutes(router *gin.Engine, auth csh_auth.Auth) {
 	api := router.Group("/api")
 	api.Use(cookieToAuthHeader())
 	api.Use(auth.HeaderMiddleware())
+
 	areas.Routes(api)
 	me.Routes(api)
+	trainings.Routes(api)
+
 }
