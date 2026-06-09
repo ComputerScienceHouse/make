@@ -2,7 +2,7 @@
 import { authState } from "@/auth";
 import type { Area } from "@/models/areas";
 import type { Training } from "@/models/trainings";
-import { ref, onMounted } from "vue";
+import { ref, onMounted, withDirectives, computed } from "vue";
 import { useRoute } from "vue-router";
 
 const user = authState.user;
@@ -13,8 +13,14 @@ const userTrainings = ref<number[] | null>(null);
 const loading = ref(true);
 const notFound = ref(false);
 
-const completedAllTrainings = ref<Boolean>(false);
+const completedAllTrainings = computed(() => {
+    return trainings.value?.every(t => userTrainings.value?.includes(t.id)) || false
+})
 
+const progress = computed(() => {
+  if (!trainings.value?.length) return 0;
+  return (userTrainings.value?.length / trainings.value.length) * 100;
+});
 const route = useRoute();
 
 onMounted(async () => {
@@ -37,8 +43,6 @@ onMounted(async () => {
         area.value = await areaRes.json()
         trainings.value = await trainingsRes.json()
         userTrainings.value = await userTrainingsRes.json()
-
-        completedAllTrainings.value = trainings.value?.every(t => userTrainings.value?.includes(t.id)) || false
     } catch (err) {
         console.error(err);
     } finally {
@@ -70,28 +74,41 @@ onMounted(async () => {
         <div class="row g-4">
             <div class="col-lg-4">
                 <div class="card h-100">
-                    <div class="card-body">
-                        <h5 class="card-title">Your Status</h5>
+                    <div class="card-body d-flex flex-column">
+                        <div class="d-flex align-items-center justify-content-between mb-3">
+                            <h5 class="card-title mb-0">Your Status</h5>
 
-                        <p class="mb-2">
+                            <span class="badge rounded-pill px-3 py-2"
+                                :class="completedAllTrainings ? 'text-bg-success' : 'text-bg-danger'">
+                                {{ completedAllTrainings ? 'Certified' : 'Incomplete' }}
+                            </span>
+                        </div>
 
-                            <span v-if="completedAllTrainings" class="badge text-bg-success">
-                                Certified
-                            </span>
-                            <span v-else class="badge text-bg-danger">
-                                Incomplete
-                            </span>
+                        <p class="mb-1 fw-semibold">
+                            {{ completedAllTrainings ? 'All training complete' : 'Training required' }}
                         </p>
 
-                        <small v-if="completedAllTrainings" class="text-body-secondary">
+                        <small v-if="completedAllTrainings" class="text-body-secondary mb-3">
                             You have completed all the bs
                         </small>
-                        <small v-else>
+                        <small v-else class="text-body-secondary mb-3">
                             Complete all required training to gain access {{ area.name }}
                         </small>
+
+                        <div class="mt-auto">
+                            <div class="progress" style="height: 6px;">
+                                <div class="progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0"
+                                    aria-valuemax="100" :style="{ width: progress + '%' }"></div>
+                            </div>
+                        </div>
+
+
                     </div>
                 </div>
             </div>
+
+
+
 
             <div class="col-lg-8">
                 <div class="card h-100">
