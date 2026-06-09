@@ -25,6 +25,7 @@ const route = useRoute();
 
 onMounted(async () => {
     try {
+        loading.value = true
 
         const [areaRes, trainingsRes, userTrainingsRes] = await Promise.all([
             fetch(`/api/areas/${route.params.id}`),
