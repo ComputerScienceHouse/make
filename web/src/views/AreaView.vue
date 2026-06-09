@@ -2,7 +2,7 @@
 import { authState } from "@/auth";
 import type { Area } from "@/models/areas";
 import type { Training } from "@/models/trainings";
-import { ref, onMounted, withDirectives, computed } from "vue";
+import { ref, onMounted, computed } from "vue";
 import { useRoute } from "vue-router";
 
 const user = authState.user;
@@ -118,7 +118,7 @@ onMounted(async () => {
                         </h5>
 
                         <ul class="list-group list-group-flush">
-                            <li v-for="training in trainings" class="list-group-item d-flex justify-content-between">
+                            <li v-for="training in trainings" :key="training.id" class="list-group-item d-flex justify-content-between">
                                 {{ training.title }}
                                 <span v-if="userTrainings?.includes(training.id)" class="badge text-bg-success">
                                     Completed

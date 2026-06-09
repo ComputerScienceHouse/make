@@ -1,22 +1,16 @@
 <script setup lang="ts">
 import { ref, onMounted } from "vue";
-import { useRouter } from "vue-router";
 import type { Area } from "@/models/areas";
 import QuickInfoCard from "@/components/QuickInfoCard.vue";
 
 
 
 const areas = ref<Area[]>([]);
-const router = useRouter();
 
 onMounted(async () => {
   const response = await fetch("/api/areas");
   areas.value = await response.json();
 });
-
-function openArea(id: number) {
-  router.push(`/areas/${id}`)
-}
 </script>
 
 <template>

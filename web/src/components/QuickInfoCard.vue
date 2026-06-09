@@ -27,7 +27,7 @@ const props = defineProps<Props>()
           <div>
             <h6 class="mb-2 text-body-secondary">Access Status:</h6>
             <ul class="list-unstyled mb-0">
-              <li v-for="area in areas" :key="area.id" class="d-flex align-items-center gap-2">
+              <li v-for="area in props.areas" :key="area.id" class="d-flex align-items-center gap-2">
 
                 <i :class="false ? 'bi bi-check-circle-fill text-success' : 'bi bi-x-circle-fill text-danger'"></i>
 
