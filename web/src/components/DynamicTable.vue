@@ -1,6 +1,5 @@
 
 <script setup lang="ts" generic="T extends Record<string, any>">
-import { authState } from '@/auth';
 import type { Area } from '@/models/areas';
 import { computed} from 'vue';
 

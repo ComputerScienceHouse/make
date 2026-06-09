@@ -1,22 +1,11 @@
 <script setup lang="ts">
-import { authState } from "@/auth";
 import DynamicTable from "@/components/DynamicTable.vue";
 import type { Area } from "@/models/areas";
-import { ref, onMounted, computed } from "vue";
-import { useRoute } from "vue-router";
-
-const user = authState.user;
+import { ref, onMounted } from "vue";
 
 const areas = ref<Area[]>([]);
 const loading = ref(true);
 const notFound = ref(false);
-
-const route = useRoute();
-
-const cols = computed(() => {
-    if (areas.value?.length === 0 || !areas.value) return [];
-    return Object.keys(areas.value[0]!) as (keyof Area)[]
-})
 
 onMounted(async () => {
     try {
