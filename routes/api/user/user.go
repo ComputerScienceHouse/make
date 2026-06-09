@@ -50,5 +50,6 @@ func Routes(route *gin.RouterGroup) {
 	areas := route.Group("/user")
 	areas.GET("/:uuid/trainings", getUserTrainings)
 
+	// DEV REMOVE IN PROD
 	areas.POST("/:uuid/trainings/", createUserTraining)
 }

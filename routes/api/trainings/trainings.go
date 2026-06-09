@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"errors"
 	"makedotcsh/database"
+	"makedotcsh/middleware"
 	"makedotcsh/models"
 	"strconv"
 
@@ -83,5 +84,5 @@ func Routes(route *gin.RouterGroup) {
 
 	areas.GET("/area/:id", getAreaTrainings)
 
-	areas.POST("/create/", createTraining)
+	areas.POST("/create/", middleware.RequireGroup("eboard"), createTraining)
 }
