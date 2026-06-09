@@ -20,7 +20,7 @@ function openArea(id: number) {
 </script>
 
 <template>
-  <main>
+  <main class="container">
     <h1>Welcome to MAKE</h1>
 
     <p>
@@ -64,6 +64,7 @@ function openArea(id: number) {
 <style scoped>
 main {
   padding: 2rem;
+  max-width: 100ch;
 }
 
 .card:hover {
@@ -78,4 +79,6 @@ button {
 }
 
 .no_underline { text-decoration: none; }
+
+
 </style>

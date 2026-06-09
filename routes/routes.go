@@ -4,6 +4,7 @@ import (
 	"makedotcsh/routes/api/areas"
 	"makedotcsh/routes/api/me"
 	"makedotcsh/routes/api/trainings"
+	"makedotcsh/routes/api/user"
 
 	csh_auth "github.com/computersciencehouse/csh-auth/v2"
 	"github.com/gin-gonic/gin"
@@ -30,5 +31,6 @@ func SetRoutes(router *gin.Engine, auth csh_auth.Auth) {
 	areas.Routes(api)
 	me.Routes(api)
 	trainings.Routes(api)
+	user.Routes(api)
 
 }

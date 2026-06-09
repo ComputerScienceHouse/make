@@ -1,38 +1,49 @@
 <script setup lang="ts">
+import { authState } from "@/auth";
 import type { Area } from "@/models/areas";
 import type { Training } from "@/models/trainings";
 import { ref, onMounted } from "vue";
 import { useRoute } from "vue-router";
 
+const user = authState.user;
+
 const area = ref<Area | null>(null);
 const trainings = ref<Training[] | null>(null);
+const userTrainings = ref<number[] | null>(null);
 const loading = ref(true);
 const notFound = ref(false);
+
+const completedAllTrainings = ref<Boolean>(false);
 
 const route = useRoute();
 
 onMounted(async () => {
     try {
 
-        const [areaRes, trainingsRes] = await Promise.all([
+        const [areaRes, trainingsRes, userTrainingsRes] = await Promise.all([
             fetch(`/api/areas/${route.params.id}`),
             fetch(`/api/trainings/area/${route.params.id}`),
+            fetch(`/api/user/${user?.uuid}/trainings`),
         ])
 
         if (areaRes.status === 404) {
             notFound.value = true;
         }
 
-        if (!areaRes.ok || !trainingsRes.ok) {
+        if (!areaRes.ok || !trainingsRes.ok || !userTrainingsRes.ok) {
             throw new Error("Failed to fetch data");
         }
 
         area.value = await areaRes.json()
         trainings.value = await trainingsRes.json()
+        userTrainings.value = await userTrainingsRes.json()
+
+        completedAllTrainings.value = trainings.value?.every(t => userTrainings.value?.includes(t.id)) || false
     } catch (err) {
         console.error(err);
     } finally {
         loading.value = false;
+        console.log(userTrainings.value)
     }
 });
 </script>
@@ -63,13 +74,20 @@ onMounted(async () => {
                         <h5 class="card-title">Your Status</h5>
 
                         <p class="mb-2">
-                            <span class="badge text-bg-success">
+
+                            <span v-if="completedAllTrainings" class="badge text-bg-success">
                                 Certified
+                            </span>
+                            <span v-else class="badge text-bg-danger">
+                                Incomplete
                             </span>
                         </p>
 
-                        <small class="text-body-secondary">
+                        <small v-if="completedAllTrainings" class="text-body-secondary">
                             You have completed all the bs
+                        </small>
+                        <small v-else>
+                            Complete all required training to gain access {{ area.name }}
                         </small>
                     </div>
                 </div>
@@ -85,14 +103,10 @@ onMounted(async () => {
                         <ul class="list-group list-group-flush">
                             <li v-for="training in trainings" class="list-group-item d-flex justify-content-between">
                                 {{ training.title }}
-                                <span class="badge text-bg-success">
-                                    Complete
+                                <span v-if="userTrainings?.includes(training.id)" class="badge text-bg-success">
+                                    Completed
                                 </span>
-                            </li>
-
-                            <li class="list-group-item d-flex justify-content-between">
-                                soldering shit
-                                <span class="badge text-bg-warning">
+                                <span v-else class="badge text-bg-warning">
                                     Required
                                 </span>
                             </li>

@@ -202,3 +202,47 @@ func (database *DatabaseHelper) GetAreaTrainings(area int) ([]models.Training, e
 
 	return trainings, nil
 }
+
+func (database *DatabaseHelper) CreateUserTraining(training models.UserTraining) error {
+	_, err := database.DB.Exec(
+		"INSERT INTO user_trainings (user_uuid, training_id, completed_at, expires_at) VALUES (?, ?, ?, ?)",
+		training.UserUUID,
+		training.TrainingID,
+		training.CompletedAt,
+		training.ExpiresAt,
+	)
+
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (database *DatabaseHelper) GetUserTrainings(uuid string) ([]int, error) {
+	rows, err := database.DB.Query("SELECT user_uuid, training_id, completed_at, expires_at FROM user_trainings WHERE user_uuid = ?", uuid)
+	if err != nil {
+		return []int{}, err
+	}
+
+	var trainings []int = []int{}
+
+	for rows.Next() {
+		var usertraining models.UserTraining
+
+		err := rows.Scan(
+			&usertraining.UserUUID,
+			&usertraining.TrainingID,
+			&usertraining.CompletedAt,
+			&usertraining.ExpiresAt,
+		)
+
+		if err != nil {
+			return []int{}, err
+		}
+
+		trainings = append(trainings, usertraining.TrainingID)
+	}
+
+	return trainings, nil
+}
