@@ -98,3 +98,65 @@ func (database *DatabaseHelper) CreateArea(area models.CreateAreaRequest) error 
 
 	return nil
 }
+
+func (database *DatabaseHelper) GetTraining(trainingID int) (models.Training, error) {
+	row := database.DB.QueryRow("SELECT id, title, description, questions FROM trainings WHERE id = ?", trainingID)
+
+	var training models.Training
+
+	err := row.Scan(
+		&training.ID,
+		&training.Title,
+		&training.Description,
+		&training.Questions,
+	)
+
+	if err != nil {
+		return models.Training{}, err
+	}
+
+	return training, nil
+}
+
+func (database *DatabaseHelper) GetAllTrainings() ([]models.Training, error) {
+	rows, err := database.DB.Query("SELECT id, title, description, questions FROM trainings")
+
+	var trainings []models.Training
+
+	for rows.Next() {
+		var training models.Training
+
+		err := rows.Scan(
+			&training.ID,
+			&training.Title,
+			&training.Description,
+			&training.Questions,
+		)
+
+		if err != nil {
+			return []models.Training{}, nil
+		}
+
+		trainings = append(trainings, training)
+	}
+	if err != nil {
+		return []models.Training{}, err
+	}
+
+	return trainings, nil
+}
+
+func (database *DatabaseHelper) CreateTraining(training models.Training) error {
+	_, err := database.DB.Exec(
+		"INSERT INTO trainings (title, description, question) VALUES (?, ?, ?)",
+		training.Title,
+		training.Description,
+		training.Questions,
+	)
+
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
