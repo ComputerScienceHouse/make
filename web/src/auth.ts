@@ -10,6 +10,9 @@ export interface UserInfo {
 
 export const authState = reactive({
     user: null as UserInfo | null,
+    isAdmin(): boolean {
+        return this.user?.groups?.includes("eboard") ?? false;
+    }
 });
 
 export async function loadUser() {
@@ -26,13 +29,6 @@ export async function loadUser() {
 
         authState.user = await res.json();
     } catch {
-        
+
     }
-
-
-
-}
-
-export function logout() {
-    authState.user = null;
 }

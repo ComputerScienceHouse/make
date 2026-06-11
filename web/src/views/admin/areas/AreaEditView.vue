@@ -5,6 +5,7 @@ import type { TableOptions } from '@/components/DynamicTable.vue'
 import { ref, onMounted } from "vue";
 import { useRoute } from "vue-router";
 import DynamicForm, { type FormOptions } from "@/components/DynamicForm.vue";
+import router from "@/router";
 
 const area = ref<Area>();
 const loading = ref(true);
@@ -50,6 +51,8 @@ async function saveArea(area: Area) {
     if (!res.ok) {
         throw new Error(`Failed to save area: ${res.status}`);
     }
+
+    router.push({path: `/areas/${area.id}`})
 
     return;
 }

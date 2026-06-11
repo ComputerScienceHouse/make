@@ -42,7 +42,7 @@ const router = createRouter({
 
 router.beforeEach((to, from) => {
   // require eboard auth
-  if (to.meta.requiresAuth && !authState.user?.groups.includes("eboard")) {
+  if (to.meta.requiresAuth && !authState.isAdmin()) {
     return {
       path: from.fullPath,
     }

@@ -18,11 +18,11 @@ const completedAllTrainings = computed(() => {
 })
 
 const progress = computed(() => {
-  if (!trainings.value?.length) return 0;
-  
-  const requiredTrainings = trainings.value.map(t => t.id);
-  const completedRequiredTrainings = userTrainings.value?.filter(id => requiredTrainings.includes(id))
-  return ((completedRequiredTrainings?.length || 0) / requiredTrainings.length) * 100;
+    if (!trainings.value?.length) return 0;
+
+    const requiredTrainings = trainings.value.map(t => t.id);
+    const completedRequiredTrainings = userTrainings.value?.filter(id => requiredTrainings.includes(id))
+    return ((completedRequiredTrainings?.length || 0) / requiredTrainings.length) * 100;
 });
 const route = useRoute();
 
@@ -66,6 +66,12 @@ onMounted(async () => {
 
             <div class="position-absolute top-0 start-0 w-100 h-100 image-gradient"></div>
 
+            <!-- admin only button -->
+            <RouterLink  v-if="authState.isAdmin()" :to="`/admin/areas/${area.id}`" class="btn btn-primary position-absolute top-0 end-0 m-3 shadow-sm">
+                <i class="bi bi-pencil-square"></i>
+            </RouterLink>
+
+
             <div class="position-absolute bottom-0 start-0 p-4 text-white">
                 <h1 class="mb-1">{{ area.name }}</h1>
                 <p class="mb-0">
@@ -81,8 +87,7 @@ onMounted(async () => {
                         <div class="d-flex align-items-center justify-content-between mb-3">
                             <h5 class="card-title mb-0">Your Status</h5>
 
-                            <span class="badge"
-                                :class="completedAllTrainings ? 'text-bg-success' : 'text-bg-danger'">
+                            <span class="badge" :class="completedAllTrainings ? 'text-bg-success' : 'text-bg-danger'">
                                 {{ completedAllTrainings ? 'Certified' : 'Incomplete' }}
                             </span>
                         </div>
@@ -121,7 +126,8 @@ onMounted(async () => {
                         </h5>
 
                         <ul class="list-group list-group-flush">
-                            <li v-for="training in trainings" :key="training.id" class="list-group-item d-flex justify-content-between">
+                            <li v-for="training in trainings" :key="training.id"
+                                class="list-group-item d-flex justify-content-between">
                                 {{ training.title }}
                                 <span v-if="userTrainings?.includes(training.id)" class="badge text-bg-success">
                                     Completed
