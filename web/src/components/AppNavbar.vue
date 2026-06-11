@@ -1,55 +1,53 @@
-<script setup lang="ts">
-import { authState } from '@/auth';
+<script setup lang="ts" generic="T extends Record<string, any>">
+import { computed } from 'vue';
+import type { TableOptions } from './DynamicTable.vue';
 
-const user = authState.user
 
-function logout() {
-    window.location.href = "/auth/logout"
+interface Props<T> {
+  data: T[];
+  options: TableOptions<T>;
 }
+
+const props = defineProps<Props<T>>();
+
+const data = props.data
+
+const cols = computed(() => {
+  if (data?.length === 0 || !data) return [];
+  return Object.keys(data[0]!) as (keyof T)[]
+})
+
 </script>
-
 <template>
-    <nav class="navbar fixed-top navbar-expand-lg navbar-dark bg-primary">
-        <div class="container">
+  <div class="table-responsive">
+    <table class="table table-striped table-hover align-middle">
+      <thead class="table-dark">
+        <tr>
+          <th v-for="col in cols" :key="col" class="text-nowrap">
+            {{ col }}
+          </th>
+          <th v-if="options.actions?.edit"></th>
+        </tr>
+      </thead>
 
-            <RouterLink class="navbar-brand" to="/">
-                <img class="object-fit-contain ms-2 me-2" height="32"
-                    src="https://assets.csh.rit.edu/pubsite/csh_logo_square.svg">
-                Make
-            </RouterLink>
-            <button class="navbar-toggler navbar-toggler-right" type="button" data-bs-toggle="collapse"
-                data-bs-target="#navbarResponsive">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarResponsive">
-                <ul class="navbar-nav mr-auto">
-                    <RouterLink class="nav-link" to="/history">History</RouterLink>
-                </ul>
-                <ul v-if="user" class="nav navbar-nav ml-auto">
-                    <div class="nav-item navbar-user dropdown">
-                        <a class="nav-link dropdown-toggle" id="userDropdownLink" data-bs-toggle="dropdown"
-                            aria-expanded="false">
-                            <img class="rounded-circle pfp me-2" :src="'https://profiles.csh.rit.edu/image/' + user.preferred_username" />
-                            <span class="light-hover me-1">{{ user.name }} </span>
-                            <span class="caret light-hover"></span>
-                        </a>
-                        <div class="dropdown-menu">
-                            <a class="dropdown-item" @click="logout()">Logout</a>
-                        </div>
-                    </div>
-                </ul>
+      <tbody>
+        <tr v-for="(row, i) in data" :key="i">
+          <td v-for="col in cols" :key="col" class="text-truncate" style="max-width: 200px;">
+            {{ row[col] }}
+          </td>
+
+          <td v-if="options.actions?.edit">
+            <div class="d-flex justify-content-center">
+              <RouterLink :to="options.actions.edit.path(row)">
+                <button type="button" class="btn btn-primary">
+                  <i class="bi bi-pencil-square"></i>
+                </button>
+              </RouterLink>
             </div>
-        </div>
-    </nav>
+          </td>
+        </tr>
+
+      </tbody>
+    </table>
+  </div>
 </template>
-
-<style scoped>
-.pfp {
-    width: 2rem;
-    height: 2rem;
-}
-
-.light-hover:hover {
-    color: white;
-}
-</style>
