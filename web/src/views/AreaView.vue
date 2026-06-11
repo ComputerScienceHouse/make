@@ -19,7 +19,10 @@ const completedAllTrainings = computed(() => {
 
 const progress = computed(() => {
   if (!trainings.value?.length) return 0;
-  return (userTrainings.value?.length / trainings.value.length) * 100;
+  
+  const requiredTrainings = trainings.value.map(t => t.id);
+  const completedRequiredTrainings = userTrainings.value?.filter(id => requiredTrainings.includes(id))
+  return ((completedRequiredTrainings?.length || 0) / requiredTrainings.length) * 100;
 });
 const route = useRoute();
 
@@ -48,7 +51,6 @@ onMounted(async () => {
         console.error(err);
     } finally {
         loading.value = false;
-        console.log(userTrainings.value)
     }
 });
 </script>
@@ -79,7 +81,7 @@ onMounted(async () => {
                         <div class="d-flex align-items-center justify-content-between mb-3">
                             <h5 class="card-title mb-0">Your Status</h5>
 
-                            <span class="badge rounded-pill px-3 py-2"
+                            <span class="badge"
                                 :class="completedAllTrainings ? 'text-bg-success' : 'text-bg-danger'">
                                 {{ completedAllTrainings ? 'Certified' : 'Incomplete' }}
                             </span>
