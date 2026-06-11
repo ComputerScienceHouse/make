@@ -3,18 +3,18 @@ import DynamicTable from "@/components/DynamicTable.vue";
 import type { Area } from "@/models/areas";
 import type { TableOptions } from '@/components/DynamicTable.vue'
 import { ref, onMounted } from "vue";
+import { useRoute } from "vue-router";
+import DynamicForm, { type FormOptions } from "@/components/DynamicForm.vue";
 
-const areas = ref<Area[]>([]);
+const area = ref<Area>();
 const loading = ref(true);
 const notFound = ref(false);
 
-const tableOptions: TableOptions<Area> = {
-    actions:  {
-        edit: {
-            // relative path, will redirect to
-            // /admin/areas/id
-            path: (area: Area) => `/admin/areas/${area.id}`
-        }
+const route = useRoute();
+
+const tableOptions: FormOptions<Area> = {
+    fields: {
+        id: { hidden: true },
     }
 }
 
@@ -22,7 +22,7 @@ onMounted(async () => {
     try {
         loading.value = true
 
-        const areaRes = await fetch(`/api/areas/`);
+        const areaRes = await fetch(`/api/areas/${route.params.id}`);
 
         if (areaRes.status === 404) {
             notFound.value = true;
@@ -32,13 +32,27 @@ onMounted(async () => {
             throw new Error("Failed to fetch data");
         }
 
-        areas.value = await areaRes.json()
+        area.value = await areaRes.json()
     } catch (err) {
         console.error(err);
     } finally {
         loading.value = false;
     }
 });
+
+async function saveArea(area: Area) {
+    const res = await fetch(`/api/areas/${area.id}`, {
+        method: "PUT",
+        body: JSON.stringify(area),
+        credentials: "include"
+    })
+
+    if (!res.ok) {
+        throw new Error(`Failed to save area: ${res.status}`);
+    }
+
+    return;
+}
 </script>
 
 
@@ -49,11 +63,10 @@ onMounted(async () => {
 
     <main class="container" v-else>
         <div class="d-flex justify-content-between align-items-center">
-            <h1>Areas:</h1>
-            <button type="button" class="btn btn-primary">Create</button>
+            <h1>Editing "{{ area?.name }}"</h1>
         </div>
 
-        <DynamicTable :data="areas" :options="tableOptions"></DynamicTable>
+        <DynamicForm :data="area!" :options="tableOptions" @submit="saveArea"></DynamicForm>
 
     </main>
 </template>

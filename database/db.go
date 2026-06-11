@@ -102,6 +102,22 @@ func (database *DatabaseHelper) CreateArea(area models.CreateAreaRequest) error 
 	return nil
 }
 
+func (database *DatabaseHelper) UpdateArea(area models.CreateAreaRequest, id int) error {
+	_, err := database.DB.Exec(
+		"UPDATE areas SET name = ?, description = ?, photourl = ? WHERE id = ?",
+		area.Name,
+		area.Description,
+		area.PhotoURL,
+		id,
+	)
+
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func (database *DatabaseHelper) GetTraining(trainingID int) (models.Training, error) {
 	row := database.DB.QueryRow("SELECT id, title, description, questions FROM trainings WHERE id = ?", trainingID)
 

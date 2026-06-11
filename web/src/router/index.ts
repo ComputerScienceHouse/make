@@ -3,6 +3,7 @@ import HomeView from '../views/HomeView.vue'
 import AreaView from '@/views/AreaView.vue'
 import AdminDashboardView from '@/views/admin/AdminDashboardView.vue'
 import AreaListView from '@/views/admin/areas/AreaListView.vue'
+import AreaEditView from '@/views/admin/areas/AreaEditView.vue'
 import { authState } from '@/auth.ts'
 
 const router = createRouter({
@@ -28,6 +29,12 @@ const router = createRouter({
       path: '/admin/areas',
       name: 'areas',
       component: AreaListView,
+      meta: { requiresAdmin: true }
+    },
+        {
+      path: '/admin/areas/:id',
+      name: 'areas',
+      component: AreaEditView,
       meta: { requiresAdmin: true }
     },
   ],
