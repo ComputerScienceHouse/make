@@ -1,11 +1,22 @@
 <script setup lang="ts">
 import DynamicTable from "@/components/DynamicTable.vue";
 import type { Area } from "@/models/areas";
+import type { TableOptions } from '@/components/DynamicTable.vue'
 import { ref, onMounted } from "vue";
 
 const areas = ref<Area[]>([]);
 const loading = ref(true);
 const notFound = ref(false);
+
+const tableOptions: TableOptions<Area> = {
+    actions:  {
+        edit: {
+            // relative path, will redirect to
+            // /admin/areas/id
+            path: (area: Area) => `${area.id}`
+        }
+    }
+}
 
 onMounted(async () => {
     try {
@@ -37,8 +48,13 @@ onMounted(async () => {
     </main>
 
     <main class="container" v-else>
-        <h1>Areas:</h1>
-        <DynamicTable :data="areas"></DynamicTable>
+        <div class="d-flex justify-content-between align-items-center">
+            <h1>Areas:</h1>
+            <button type="button" class="btn btn-primary">Create</button>
+        </div>
+
+        <DynamicTable :data="areas" :options="tableOptions"></DynamicTable>
+
     </main>
 </template>
 
