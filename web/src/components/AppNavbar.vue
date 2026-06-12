@@ -23,9 +23,11 @@ function logout() {
             </button>
             <div class="collapse navbar-collapse" id="navbarResponsive">
                 <ul class="navbar-nav mr-auto">
-                    <RouterLink class="nav-link" to="/history">History</RouterLink>
+                    <RouterLink class="nav-link" to="/">Areas</RouterLink>
+                    <RouterLink v-if="authState.isAdmin()" class="nav-link" to="/history"></RouterLink>
+                    <RouterLink v-if="authState.isAdmin()" class="nav-link" to="/history">History</RouterLink>
                 </ul>
-                <ul v-if="user" class="nav navbar-nav ml-auto">
+                <ul v-if="user" class="nav navbar-nav ms-auto">
                     <div class="nav-item navbar-user dropdown">
                         <a class="nav-link dropdown-toggle" id="userDropdownLink" data-bs-toggle="dropdown"
                             aria-expanded="false">
