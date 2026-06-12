@@ -105,7 +105,7 @@ async function saveArea(area: Area) {
     </main>
 </template>
 
-<style>
+<style scoped>
 main {
     padding: 2rem;
     max-width: 100ch;

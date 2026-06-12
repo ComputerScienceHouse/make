@@ -12,3 +12,11 @@ type CreateAreaRequest struct {
 	Description string `json:"description"`
 	PhotoURL    string `json:"photourl"`
 }
+
+type AreaWithAccess struct {
+	ID          int    `json:"id"`
+	Name        string `json:"name"`
+	Description string `json:"description"`
+	PhotoURL    string `json:"photourl"`
+	HasAccess   bool   `json:"hasAccess"`
+}

@@ -46,9 +46,22 @@ func createUserTraining(c *gin.Context) {
 	c.Status(201)
 }
 
+// TODO: can this be made more efficient?
+func getUserAreaAccess(c *gin.Context) {
+	uuid := c.Param("uuid")
+	areas, err := database.Helper.GetAllAreasWithUserAccess(uuid)
+	if err != nil {
+		c.Error(err)
+		return
+	}
+
+	c.JSON(200, areas)
+}
+
 func Routes(route *gin.RouterGroup) {
 	areas := route.Group("/user")
 	areas.GET("/:uuid/trainings", getUserTrainings)
+	areas.GET("/:uuid/areaAccess", getUserAreaAccess)
 
 	// DEV REMOVE IN PROD
 	areas.POST("/:uuid/trainings/", createUserTraining)

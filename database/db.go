@@ -289,3 +289,28 @@ func (database *DatabaseHelper) RemoveTrainingFromArea(areaID int, trainingID in
 	}
 	return nil
 }
+
+func (database *DatabaseHelper) GetAllAreasWithUserAccess(uuid string) ([]int, error) {
+	// insane query god bless sql (this was 100 lines of logic beforehand)
+	query := "SELECT a.id FROM areas a JOIN area_trainings at ON at.area_id = a.id LEFT JOIN user_trainings ut ON ut.training_id = at.training_id AND ut.user_uuid = ? GROUP BY a.id, a.name HAVING COUNT(DISTINCT at.training_id) = COUNT(DISTINCT ut.training_id)"
+	rows, err := database.DB.Query(query, uuid)
+	if err != nil {
+		return []int{}, err
+	}
+
+	areas := []int{}
+
+	for rows.Next() {
+		var area_id int
+
+		err := rows.Scan(&area_id)
+
+		if err != nil {
+			return []int{}, err
+		}
+
+		areas = append(areas, area_id)
+	}
+
+	return areas, nil
+}
