@@ -1,17 +1,8 @@
 <script setup lang="ts">
 import type { Area } from "@/models/areas";
 import { ref } from "vue";
-import { useRoute } from "vue-router";
 import DynamicForm, { type FormOptions } from "@/components/DynamicForm.vue";
 import router from "@/router";
-import type { Training } from "@/models/trainings";
-import DynamicTable from "@/components/DynamicTable.vue";
-import type { TableOptions } from "@/components/DynamicTable.vue";
-import AddTrainingPopup from "@/components/AddTrainingPopup.vue";
-;
-
-const route = useRoute();
-const showTrainingModal = ref(false);
 
 const area = ref<Area>({
   id: 0, // id is ignored by api when creating a new area

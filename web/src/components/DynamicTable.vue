@@ -48,7 +48,7 @@ const options = props.options
 const cols = computed(() => {
   if (data?.length === 0 || !data) return [];
 
-  let keys = Object.keys(data[0]!) as (keyof T)[]
+  const keys = Object.keys(data[0]!) as (keyof T)[]
   return keys.filter(col => !options.fields?.[col]?.hidden)
 })
 

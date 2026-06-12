@@ -39,8 +39,8 @@ onMounted(async () => {
         loading.value = true
 
         const [areaRes, trainingRes] = await Promise.all([
-            await fetch(`/api/areas/${route.params.id}`),
-            await fetch(`/api/trainings/area/${route.params.id}`),
+            fetch(`/api/areas/${route.params.id}`),
+            fetch(`/api/trainings/area/${route.params.id}`),
         ]);
 
         if (areaRes.status === 404) {

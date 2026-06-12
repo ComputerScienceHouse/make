@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import type { Training } from '@/models/trainings';
 import { onMounted, ref } from 'vue';
-import { useRoute } from 'vue-router';
 import DynamicTable from './DynamicTable.vue';
 import type { TableOptions } from './DynamicTable.vue';
 
