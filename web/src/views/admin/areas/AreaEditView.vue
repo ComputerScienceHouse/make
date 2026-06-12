@@ -1,39 +1,58 @@
 <script setup lang="ts">
-import DynamicTable from "@/components/DynamicTable.vue";
 import type { Area } from "@/models/areas";
-import type { TableOptions } from '@/components/DynamicTable.vue'
 import { ref, onMounted } from "vue";
 import { useRoute } from "vue-router";
-import DynamicForm, { type FormOptions } from "@/components/DynamicForm.vue";
+import DynamicForm from "@/components/DynamicForm.vue";
 import router from "@/router";
+import type { Training } from "@/models/trainings";
+import DynamicTable from "@/components/DynamicTable.vue";
+import type { TableOptions } from "@/components/DynamicTable.vue";
+import AddTrainingPopup from "@/components/AddTrainingPopup.vue";
 
 const area = ref<Area>();
+const trainings = ref<Training[]>();
 const loading = ref(true);
 const notFound = ref(false);
 
 const route = useRoute();
 
-const tableOptions: FormOptions<Area> = {
+const showTrainingModal = ref(false);
+
+const tableOptions: TableOptions<Training> = {
     fields: {
-        id: { hidden: true },
+        questions: { hidden: true },
+    },
+    actions: {
+        delete: {
+            handler: async (t) => {
+                await fetch(`/api/trainings/area/${area.value?.id}`, {
+                    body: JSON.stringify({ "id": t.id }),
+                    method: "DELETE",
+                    credentials: "include",
+                });
+            },
+        },
     }
 }
-
 onMounted(async () => {
     try {
         loading.value = true
 
-        const areaRes = await fetch(`/api/areas/${route.params.id}`);
+        const [areaRes, trainingRes] = await Promise.all([
+            await fetch(`/api/areas/${route.params.id}`),
+            await fetch(`/api/trainings/area/${route.params.id}`),
+        ]);
 
         if (areaRes.status === 404) {
             notFound.value = true;
         }
 
-        if (!areaRes.ok) {
+        if (!areaRes.ok || !trainingRes.ok) {
             throw new Error("Failed to fetch data");
         }
 
         area.value = await areaRes.json()
+        trainings.value = await trainingRes.json()
     } catch (err) {
         console.error(err);
     } finally {
@@ -52,7 +71,7 @@ async function saveArea(area: Area) {
         throw new Error(`Failed to save area: ${res.status}`);
     }
 
-    router.push({path: `/areas/${area.id}`})
+    router.push({ path: `/areas/${area.id}` })
 
     return;
 }
@@ -60,17 +79,29 @@ async function saveArea(area: Area) {
 
 
 <template>
+    <AddTrainingPopup v-if="showTrainingModal && area" :areaid="area.id"  @close="showTrainingModal = false">
+    </AddTrainingPopup>
+
     <main class="container py-4" v-if="loading">
         <h1>Loading...</h1>
     </main>
 
-    <main class="container" v-else>
+    <main class="container" v-else-if="area && trainings">
         <div class="d-flex justify-content-between align-items-center">
             <h1>Editing "{{ area?.name }}"</h1>
         </div>
 
-        <DynamicForm :data="area!" :options="tableOptions" @submit="saveArea"></DynamicForm>
+        <DynamicForm :data="area" :options="tableOptions" @submit="saveArea" class="mb-3"></DynamicForm>
 
+        <div class="d-flex justify-content-between align-items-center">
+            <h1>Required Trainings:</h1>
+            <button type="button" class="btn btn-primary" @click="showTrainingModal = true">
+                <i class="bi-plus-lg"></i>
+            </button>
+        </div>
+
+
+        <DynamicTable :data="trainings" :options="tableOptions"></DynamicTable>
     </main>
 </template>
 

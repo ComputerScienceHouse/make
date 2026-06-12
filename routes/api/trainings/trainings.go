@@ -77,6 +77,50 @@ func getAreaTrainings(c *gin.Context) {
 	c.JSON(200, trainings)
 }
 
+func addTrainingToArea(c *gin.Context) {
+	var req []int
+	id, err := strconv.Atoi(c.Param("id"))
+	err = c.ShouldBindBodyWithJSON(&req)
+	if err != nil {
+		c.JSON(400, gin.H{
+			"error": err.Error(),
+		})
+		return
+	}
+
+	err = database.Helper.AddTrainingsToArea(id, req)
+	if err != nil {
+		c.Error(err)
+		return
+	}
+
+	c.Status(201)
+}
+
+type RemoveTrainingRequest struct {
+	ID int `json:"id"`
+}
+
+func removeTrainingFromArea(c *gin.Context) {
+	var req RemoveTrainingRequest
+	id, err := strconv.Atoi(c.Param("id"))
+	err = c.ShouldBindBodyWithJSON(&req)
+	if err != nil {
+		c.JSON(400, gin.H{
+			"error": err.Error(),
+		})
+		return
+	}
+
+	err = database.Helper.RemoveTrainingFromArea(id, req.ID)
+	if err != nil {
+		c.Error(err)
+		return
+	}
+
+	c.Status(201)
+}
+
 func Routes(route *gin.RouterGroup) {
 	areas := route.Group("/trainings")
 	areas.GET("/", getAllTrainings)
@@ -84,5 +128,8 @@ func Routes(route *gin.RouterGroup) {
 
 	areas.GET("/area/:id", getAreaTrainings)
 
+	areas.POST("/area/:id", middleware.RequireGroup("eboard"), addTrainingToArea)
 	areas.POST("/create/", middleware.RequireGroup("eboard"), createTraining)
+
+	areas.DELETE("/area/:id", middleware.RequireGroup("eboard"), removeTrainingFromArea)
 }

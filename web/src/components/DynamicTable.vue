@@ -1,13 +1,23 @@
 <script setup lang="ts" generic="T extends Record<string, any>">
-import type { Area } from '@/models/areas';
 import { computed } from 'vue';
 
 export interface TableOptions<T> {
   actions?: {
     edit?: {
-      path: (row: T) => string
+      path: (row: T) => string;
     },
-  }
+    delete?: {
+      handler: (row: T) => Promise<void>;
+    },
+    checkbox?: boolean
+  };
+
+  fields?: {
+    [K in keyof T]?: {
+      label?: string;
+      hidden?: boolean;
+    };
+  };
 }
 
 interface Props<T> {
@@ -17,12 +27,35 @@ interface Props<T> {
 
 const props = defineProps<Props<T>>();
 
+const selectedRows = defineModel<T[]>({ default: [] });
+function toggleRow(row: T, checked: boolean) {
+  if (checked) {
+    if (!selectedRows.value.includes(row)) {
+      selectedRows.value.push(row);
+    }
+  } else {
+    const index = selectedRows.value.indexOf(row);
+
+    if (index !== -1) {
+      selectedRows.value.splice(index, 1);
+    }
+  }
+}
+
 const data = props.data
+const options = props.options
 
 const cols = computed(() => {
   if (data?.length === 0 || !data) return [];
-  return Object.keys(data[0]!) as (keyof T)[]
+
+  let keys = Object.keys(data[0]!) as (keyof T)[]
+  return keys.filter(col => !options.fields?.[col]?.hidden)
 })
+
+async function deleteRow(row: T) {
+  await options.actions?.delete?.handler(row);
+  window.location.reload();
+}
 
 </script>
 <template>
@@ -34,6 +67,8 @@ const cols = computed(() => {
             {{ col }}
           </th>
           <th v-if="options.actions?.edit"></th>
+          <th v-if="options.actions?.delete"></th>
+          <th v-if="options.actions?.checkbox"></th>
         </tr>
       </thead>
 
@@ -51,6 +86,19 @@ const cols = computed(() => {
                 </button>
               </RouterLink>
             </div>
+          </td>
+
+          <td v-if="options.actions?.delete">
+            <div class="d-flex justify-content-center">
+              <button type="button" class="btn btn-primary" @click="deleteRow(row)">
+                <i class="bi bi-trash"></i>
+              </button>
+            </div>
+          </td>
+
+          <td v-if="options.actions?.checkbox">
+            <input type="checkbox" :checked="selectedRows.includes(row)" class="form-check-input"
+              @change="toggleRow(row, ($event.target as HTMLInputElement).checked)" />
           </td>
         </tr>
 

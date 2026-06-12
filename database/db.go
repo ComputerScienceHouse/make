@@ -262,3 +262,30 @@ func (database *DatabaseHelper) GetUserTrainings(uuid string) ([]int, error) {
 
 	return trainings, nil
 }
+
+func (database *DatabaseHelper) AddTrainingsToArea(areaID int, trainingIDs []int) error {
+	for _, trainingID := range trainingIDs {
+		_, err := database.DB.Exec(
+			"INSERT INTO area_trainings (area_id, training_id) VALUES (?, ?)",
+			areaID, trainingID,
+		)
+
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (database *DatabaseHelper) RemoveTrainingFromArea(areaID int, trainingID int) error {
+	_, err := database.DB.Exec(
+		"DELETE FROM area_trainings WHERE area_id = ? AND training_id = ?",
+		areaID, trainingID,
+	)
+
+	if err != nil {
+		return err
+	}
+	return nil
+}
