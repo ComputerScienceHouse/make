@@ -2,5 +2,6 @@ CREATE TABLE areas (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     name TEXT NOT NULL,
     description TEXT,
-    photourl TEXT
+    ldapgroup TEXT,
+    photourl TEXT NOT NULL
 );

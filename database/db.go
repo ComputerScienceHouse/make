@@ -38,7 +38,7 @@ func Init() {
 }
 
 func (database *DatabaseHelper) GetArea(areaID int) (models.Area, error) {
-	row := database.DB.QueryRow("SELECT id, name, description, photourl FROM areas WHERE id = ?", areaID)
+	row := database.DB.QueryRow("SELECT id, name, description, ldapgroup, photourl FROM areas WHERE id = ?", areaID)
 
 	var area models.Area
 
@@ -46,6 +46,7 @@ func (database *DatabaseHelper) GetArea(areaID int) (models.Area, error) {
 		&area.ID,
 		&area.Name,
 		&area.Description,
+		&area.LdapGroup,
 		&area.PhotoURL,
 	)
 
@@ -57,12 +58,12 @@ func (database *DatabaseHelper) GetArea(areaID int) (models.Area, error) {
 }
 
 func (database *DatabaseHelper) GetAllAreas() ([]models.Area, error) {
-	rows, err := database.DB.Query("SELECT id, name, description, photourl FROM areas")
+	rows, err := database.DB.Query("SELECT id, name, description, ldapgroup, photourl FROM areas")
 	if err != nil {
 		return []models.Area{}, nil
 	}
 
-	var areas []models.Area
+	var areas []models.Area = []models.Area{}
 
 	for rows.Next() {
 		var area models.Area
@@ -71,6 +72,7 @@ func (database *DatabaseHelper) GetAllAreas() ([]models.Area, error) {
 			&area.ID,
 			&area.Name,
 			&area.Description,
+			&area.LdapGroup,
 			&area.PhotoURL,
 		)
 
@@ -89,9 +91,10 @@ func (database *DatabaseHelper) GetAllAreas() ([]models.Area, error) {
 
 func (database *DatabaseHelper) CreateArea(area models.CreateAreaRequest) error {
 	_, err := database.DB.Exec(
-		"INSERT INTO areas (name, description, photourl) VALUES (?, ?, ?)",
+		"INSERT INTO areas (name, description, ldapgroup, photourl) VALUES (?, ?, ?, ?)",
 		area.Name,
 		area.Description,
+		area.LdapGroup,
 		area.PhotoURL,
 	)
 
@@ -104,9 +107,10 @@ func (database *DatabaseHelper) CreateArea(area models.CreateAreaRequest) error 
 
 func (database *DatabaseHelper) UpdateArea(area models.CreateAreaRequest, id int) error {
 	_, err := database.DB.Exec(
-		"UPDATE areas SET name = ?, description = ?, photourl = ? WHERE id = ?",
+		"UPDATE areas SET name = ?, description = ?, ldapgroup = ?, photourl = ? WHERE id = ?",
 		area.Name,
 		area.Description,
+		area.LdapGroup,
 		area.PhotoURL,
 		id,
 	)

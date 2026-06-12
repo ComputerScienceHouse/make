@@ -5,6 +5,7 @@ import AdminDashboardView from '@/views/admin/AdminDashboardView.vue'
 import AreaListView from '@/views/admin/areas/AreaListView.vue'
 import AreaEditView from '@/views/admin/areas/AreaEditView.vue'
 import { authState } from '@/auth.ts'
+import AreaCreateView from '@/views/admin/areas/AreaCreateView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -31,10 +32,16 @@ const router = createRouter({
       component: AreaListView,
       meta: { requiresAdmin: true }
     },
-        {
+    {
       path: '/admin/areas/:id',
-      name: 'areas',
+      name: 'areaEdit',
       component: AreaEditView,
+      meta: { requiresAdmin: true }
+    },
+    {
+      path: '/admin/areas/create',
+      name: 'areaCreate',
+      component: AreaCreateView,
       meta: { requiresAdmin: true }
     },
   ],

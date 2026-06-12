@@ -36,9 +36,15 @@ function submit() {
 <template>
     <form @submit.prevent="submit">
         <div class="mb-3" v-for="(key, i) in keys" :key="i">
-            <label :for="i.toString()" class="form-label">{{ key }}</label>
+            <label :for="i.toString()" class="form-label">{{ key}}</label>
             <input type="text" class="form-control" v-model="data[key]" :id="i.toString()">
         </div>
         <button type="submit" class="btn btn-primary">Save</button>
     </form>
 </template>
+
+<style scoped>
+label::first-letter {
+text-transform: capitalize;
+}
+</style>

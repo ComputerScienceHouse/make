@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { ref, onMounted } from "vue";
 import type { Area } from "@/models/areas";
-import QuickInfoCard from "@/components/QuickInfoCard.vue";
 import { authState } from "@/auth";
 
 
@@ -13,7 +12,7 @@ onMounted(async () => {
   const [areaRes, accessRes] = await Promise.all([
     fetch("/api/areas"),
     fetch(`/api/user/${user?.uuid}/areaAccess`),
-  ]) 
+  ])
   areas.value = await areaRes.json();
   areasWithAccess.value = await accessRes.json();
 });
@@ -45,7 +44,8 @@ onMounted(async () => {
             <ul class="list-unstyled mb-0">
               <li v-for="area in areas" :key="area.id" class="d-flex align-items-center gap-2">
 
-                <i :class="areasWithAccess.includes(area.id) ? 'bi bi-check-circle-fill text-success' : 'bi bi-x-circle-fill text-danger'"></i>
+                <i
+                  :class="areasWithAccess.includes(area.id) ? 'bi bi-check-circle-fill text-success' : 'bi bi-x-circle-fill text-danger'"></i>
 
                 {{ area.name }}
               </li>
@@ -55,7 +55,13 @@ onMounted(async () => {
       </div>
     </div>
 
-    <h1>Areas</h1>
+    <div class="d-flex justify-content-between align-items-center">
+      <h1>Areas:</h1>
+      <RouterLink v-if="authState.isAdmin()" to="/admin/areas/create" class="btn btn-primary">
+          <i class="bi-plus-lg"></i>
+      </RouterLink>
+    </div>
+
 
     <div class="row g-4">
 
@@ -63,8 +69,7 @@ onMounted(async () => {
       <div v-for="area in areas" :key="area.id" class="col-12 col-md-6">
         <RouterLink class="no_underline" :to="'/areas/' + area.id">
           <div class="card h-100 border-1 shadow-none">
-            <img :src="area.photourl" class="card-img-top"
-              height="150" :alt="area.name" />
+            <img :src="area.photourl" class="card-img-top" height="150" :alt="area.name" />
 
             <div class="card-body d-flex flex-column">
               <h4 class="card-title mb-2">
@@ -103,7 +108,7 @@ button {
   cursor: pointer;
 }
 
-.no_underline { text-decoration: none; }
-
-
+.no_underline {
+  text-decoration: none;
+}
 </style>
