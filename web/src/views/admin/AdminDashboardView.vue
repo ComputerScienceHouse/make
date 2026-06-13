@@ -51,9 +51,9 @@ const sections = [
             <h1 class="mb-4">Admin Dashboard</h1>
 
             <div>
-                <div v-for="section in sections" class="row g-4 mb-4">
+                <div v-for="section in sections" class="row g-4 mb-2">
                     <h1> {{ section.title }}</h1>
-                    <div v-for="item in section.items" :key="section.title" class="col-md-6 col-lg-4 mt-2">
+                    <div v-for="item in section.items" :key="section.title" class="col-md-6 col-lg-4 mt-2 mb-2">
                         <RouterLink :to="item.path" class="text-decoration-none">
                             <div class="card h-100 shadow-sm">
                                 <div class="card-body">
