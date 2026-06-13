@@ -184,6 +184,22 @@ func (database *DatabaseHelper) CreateTraining(training models.CreateTrainingReq
 	return nil
 }
 
+func (database *DatabaseHelper) UpdateTraining(training models.CreateTrainingRequest, trainingId int) error {
+	_, err := database.DB.Exec(
+		"UPDATE trainings SET title = ?, description = ?, questions = ? WHERE id = ?",
+		training.Title,
+		training.Description,
+		training.Questions,
+		trainingId,
+	)
+
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 type dbAreaTraining struct {
 	areaID     int
 	trainingID int
