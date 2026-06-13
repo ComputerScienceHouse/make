@@ -104,5 +104,9 @@ async function deleteRow(row: T) {
 
       </tbody>
     </table>
+
+    <span v-if="cols.length === 0">
+      No recorded data
+    </span>
   </div>
 </template>
