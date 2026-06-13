@@ -140,15 +140,15 @@ func deleteTraining(c *gin.Context) {
 }
 
 func Routes(route *gin.RouterGroup) {
-	areas := route.Group("/trainings")
-	areas.GET("/", getAllTrainings)
-	areas.GET("/:id", getTraining)
+	trainings := route.Group("/trainings")
+	trainings.GET("/", getAllTrainings)
+	trainings.GET("/:id", getTraining)
 
-	areas.GET("/area/:id", getAreaTrainings)
+	trainings.GET("/area/:id", getAreaTrainings)
 
-	areas.POST("/area/:id", middleware.RequireGroup("eboard"), addTrainingToArea)
-	areas.POST("/create/", middleware.RequireGroup("eboard"), createTraining)
+	trainings.POST("/area/:id", middleware.RequireGroup("eboard"), addTrainingToArea)
+	trainings.POST("/create/", middleware.RequireGroup("eboard"), createTraining)
 
-	areas.DELETE("/area/:id", middleware.RequireGroup("eboard"), removeTrainingFromArea)
-	areas.DELETE("/:id", middleware.RequireGroup("eboard"), deleteTraining)
+	trainings.DELETE("/area/:id", middleware.RequireGroup("eboard"), removeTrainingFromArea)
+	trainings.DELETE("/:id", middleware.RequireGroup("eboard"), deleteTraining)
 }
