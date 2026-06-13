@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"errors"
 	"makedotcsh/database"
+	"makedotcsh/middleware"
 	"makedotcsh/models"
 
 	"github.com/gin-gonic/gin"
@@ -63,6 +64,5 @@ func Routes(route *gin.RouterGroup) {
 	areas.GET("/:uuid/trainings", getUserTrainings)
 	areas.GET("/:uuid/areaAccess", getUserAreaAccess)
 
-	// DEV REMOVE IN PROD
-	areas.POST("/:uuid/trainings/", createUserTraining)
+	areas.POST("/:uuid/trainings/", middleware.RequireGroup("eboard"), createUserTraining)
 }
