@@ -19,7 +19,7 @@ var Helper *DatabaseHelper
 func Init() {
 	var err error
 
-	DB, err = sql.Open("sqlite", "database.db")
+	DB, err = sql.Open("sqlite3", "database.db?_foreign_keys=on")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -144,7 +144,7 @@ func (database *DatabaseHelper) GetAllTrainings() ([]models.Training, error) {
 		return []models.Training{}, nil
 	}
 
-	var trainings []models.Training
+	var trainings []models.Training = []models.Training{}
 
 	for rows.Next() {
 		var training models.Training
@@ -278,6 +278,20 @@ func (database *DatabaseHelper) GetUserTrainings(uuid string) ([]int, error) {
 	}
 
 	return trainings, nil
+}
+
+func (database *DatabaseHelper) DeleteTrainingFromUser(trainingID int, uuid string) error {
+	_, err := database.DB.Exec(
+		"DELETE FROM user_trainings WHERE user_uuid = ? AND training_id = ?",
+		uuid,
+		trainingID,
+	)
+
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func (database *DatabaseHelper) AddTrainingsToArea(areaID int, trainingIDs []int) error {

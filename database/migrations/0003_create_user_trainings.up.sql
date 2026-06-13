@@ -4,5 +4,5 @@ CREATE TABLE user_trainings (
     completed_at DATETIME NOT NULL,
     expires_at DATETIME NOT NULL,
     PRIMARY KEY (user_uuid, training_id),
-    FOREIGN KEY (training_id) REFERENCES trainings(id)
+    FOREIGN KEY (training_id) REFERENCES trainings(id) ON DELETE CASCADE
 );
