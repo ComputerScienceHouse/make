@@ -12,16 +12,16 @@ import (
 func getUserTrainings(c *gin.Context) {
 	uuid := c.Param("uuid")
 
-	userTrainings, err := database.Helper.GetUserTrainings(uuid)
+	userTrainings, err := database.Helper.GetCompletedUserTrainings(uuid)
 	if err != nil {
 		c.Error(err)
 		return
 	}
 
-	trainings := []models.Training{}
+	trainings := []models.UserTraining{}
 
 	for _, id := range userTrainings {
-		training, err := database.Helper.GetTraining(id)
+		training, err := database.Helper.GetUserTraining(id)
 		if err != nil {
 			c.Error(err)
 			return

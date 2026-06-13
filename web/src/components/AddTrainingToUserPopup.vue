@@ -106,7 +106,7 @@ async function save() {
                             </option>
 
                             <option v-for="t in trainings" :key="t.id" :value="t.id">
-                                {{ t.title }}
+                                {{ t.title }} (id: {{ t.id }})
                             </option>
                         </select>
 

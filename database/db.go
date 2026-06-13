@@ -252,7 +252,7 @@ func (database *DatabaseHelper) CreateUserTraining(training models.UserTraining)
 	return nil
 }
 
-func (database *DatabaseHelper) GetUserTrainings(uuid string) ([]int, error) {
+func (database *DatabaseHelper) GetCompletedUserTrainings(uuid string) ([]int, error) {
 	rows, err := database.DB.Query("SELECT user_uuid, training_id, completed_at, expires_at FROM user_trainings WHERE user_uuid = ?", uuid)
 	if err != nil {
 		return []int{}, err
@@ -278,6 +278,25 @@ func (database *DatabaseHelper) GetUserTrainings(uuid string) ([]int, error) {
 	}
 
 	return trainings, nil
+}
+
+func (database *DatabaseHelper) GetUserTraining(trainingID int) (models.UserTraining, error) {
+	row := database.DB.QueryRow("SELECT user_uuid, training_id, completed_at, expires_at FROM user_trainings WHERE training_id = ?", trainingID)
+
+	var training models.UserTraining
+
+	err := row.Scan(
+		&training.UserUUID,
+		&training.TrainingID,
+		&training.CompletedAt,
+		&training.ExpiresAt,
+	)
+
+	if err != nil {
+		return models.UserTraining{}, err
+	}
+
+	return training, nil
 }
 
 func (database *DatabaseHelper) DeleteTrainingFromUser(trainingID int, uuid string) error {

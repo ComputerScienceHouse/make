@@ -36,7 +36,7 @@ const sections = [
             {
                 title: "Manage User Trainings ",
                 description: "Manage trainings completed by a user",
-                path: "/admin/trainings/create",
+                path: "/admin/user/trainings",
                 icon: "bi-plus-circle"
             },
         ]

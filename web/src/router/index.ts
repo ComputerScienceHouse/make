@@ -67,7 +67,7 @@ const router = createRouter({
       meta: { requiresAdmin: true }
     },
     {
-      path: '/admin/user/:uuid/trainings',
+      path: '/admin/user/trainings',
       name: 'userTrainingList',
       component: UserTrainingsListView,
       meta: { requiresAdmin: true }

@@ -1,44 +1,97 @@
 <script setup lang="ts">
 import DynamicTable from "@/components/DynamicTable.vue";
-import type { Area } from "@/models/areas";
-import type { TableOptions } from '@/components/DynamicTable.vue'
-import { ref, onMounted, computed } from "vue";
-import type { Training } from "@/models/trainings";
-import { useRoute } from "vue-router";
 import AddTrainingToUserPopup from "@/components/AddTrainingToUserPopup.vue";
 
-const trainings = ref<Training[]>([]);
+import type { TableOptions } from "@/components/DynamicTable.vue";
+import type { Training, UserTraining } from "@/models/trainings";
+import type { Member } from "@/models/member";
+
+import { ref, onMounted, computed } from "vue";
+
+const members = ref<Member[]>([]);
+const selectedMember = ref<Member>();
+const memberSearch = ref("");
+
+const trainings = ref<UserTraining[]>([]);
 const loading = ref(true);
-const route = useRoute();
+const trainingsLoading = ref(false);
+
 const showTrainingModal = ref(false);
 
-const uuid = computed(() => {
-    return route.params.uuid as string
-})
-
-const tableOptions: TableOptions<Training> = {
-    actions:  {
+const tableOptions: TableOptions<UserTraining> = {
+    actions: {
         delete: {
-            handler: async (training: Training) => {
-                await fetch(`/api/user/${uuid}/${training.id}`, {
-                    method: "DELETE",
-                    credentials: "include"
-                })
+            handler: async (training: UserTraining) => {
+                if (!selectedMember.value) return;
+
+                const res = await fetch(
+                    `/api/user/${selectedMember.value.uuid}/${training.trainingId}`,
+                    {
+                        method: "DELETE",
+                        credentials: "include"
+                    }
+                );
+
+                if (!res.ok) {
+                    throw new Error("Failed to delete training");
+                }
             }
         }
+    },
+    fields: {
+        userUuid: {
+            hidden: true
+        }
+    }
+};
+
+async function loadTrainings() {
+    const member = members.value.find(
+        m => m.username === memberSearch.value
+    );
+
+    if (!member) {
+        alert("Please select a valid member.");
+        return;
+    }
+
+    selectedMember.value = member;
+
+    try {
+        trainingsLoading.value = true;
+
+        const trainingsRes = await fetch(
+            `/api/user/${member.uuid}/trainings`,
+            {
+                credentials: "include"
+            }
+        );
+
+        if (!trainingsRes.ok) {
+            throw new Error("Failed to fetch trainings");
+        }
+
+        trainings.value = await trainingsRes.json();
+    } catch (err) {
+        console.error(err);
+    } finally {
+        trainingsLoading.value = false;
     }
 }
 
 onMounted(async () => {
     try {
-        loading.value = true
-        const trainingsRes = await fetch(`/api/user/${route.params.uuid}/trainings`);
+        loading.value = true;
 
-        if (!trainingsRes.ok) {
-            throw new Error("Failed to fetch data");
+        const membersRes = await fetch("/api/members/active", {
+            credentials: "include"
+        });
+
+        if (!membersRes.ok) {
+            throw new Error("Failed to fetch members");
         }
 
-        trainings.value = await trainingsRes.json()
+        members.value = await membersRes.json();
     } catch (err) {
         console.error(err);
     } finally {
@@ -47,27 +100,54 @@ onMounted(async () => {
 });
 </script>
 
-
 <template>
-    <AddTrainingToUserPopup v-if="showTrainingModal && trainings" :uuid="uuid"  @close="showTrainingModal = false">
-    </AddTrainingToUserPopup>
+    <AddTrainingToUserPopup v-if="showTrainingModal && selectedMember" :uuid="selectedMember.uuid"
+        @close="showTrainingModal = false" />
 
     <main class="container py-4" v-if="loading">
         <h1>Loading...</h1>
     </main>
 
     <main class="container" v-else>
-        <div class="d-flex justify-content-between align-items-center">
-            <h1>User Trainings:</h1>
-            <button to="/admin/trainings/create" class="btn btn-primary" @click="showTrainingModal = true">Add</button>
+        <h1 class="mb-4">Editing User Trainings</h1>
+        <div class="mb-4">
+            <label for="memberSearch" class="form-label">
+                Select member
+            </label>
+
+            <div class="input-group">
+                <input id="memberSearch" class="form-control" list="memberOptions" v-model="memberSearch"
+                    placeholder="Type a username..." />
+
+                <button class="btn btn-primary" @click="loadTrainings">
+                    Load Trainings
+                </button>
+            </div>
+
+            <datalist id="memberOptions">
+                <option v-for="member in members" :key="member.uuid" :value="member.username" />
+            </datalist>
         </div>
 
-        <DynamicTable :data="trainings" :options="tableOptions"></DynamicTable>
+        <div v-if="selectedMember">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h1>{{ selectedMember.username }}'s Completed Trainings</h1>
 
+                <button class="btn btn-primary" @click="showTrainingModal = true">
+                    <i class="bi bi-plus-lg"></i>
+                </button>
+            </div>
+
+            <div v-if="trainingsLoading">
+                Loading trainings...
+            </div>
+
+            <DynamicTable v-else :data="trainings" :options="tableOptions" />
+        </div>
     </main>
 </template>
 
-<style>
+<style scoped>
 main {
     padding: 2rem;
     max-width: 100ch;

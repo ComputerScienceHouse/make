@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { authState } from "@/auth";
 import type { Area } from "@/models/areas";
-import type { Training } from "@/models/trainings";
+import type { Training, UserTraining } from "@/models/trainings";
 import { ref, onMounted, computed } from "vue";
 import { useRoute } from "vue-router";
 
@@ -9,19 +9,19 @@ const user = authState.user;
 
 const area = ref<Area | null>(null);
 const trainings = ref<Training[] | null>(null);
-const userTrainings = ref<Training[] | null>(null);
+const userTrainings = ref<UserTraining[] | null>(null);
 const loading = ref(true);
 const notFound = ref(false);
 
 const completedAllTrainings = computed(() => {
-    return trainings.value?.every(t => userTrainings.value?.some(tr => tr.id == t.id)) || false
+    return trainings.value?.every(t => userTrainings.value?.some(tr => tr.trainingId == t.id)) || false
 })
 
 const progress = computed(() => {
     if (!trainings.value?.length) return 0;
 
     const requiredTrainings = trainings.value.map(t => t.id);
-    const completedRequiredTrainings = userTrainings.value?.filter(training => requiredTrainings.includes(training.id))
+    const completedRequiredTrainings = userTrainings.value?.filter(training => requiredTrainings.includes(training.trainingId))
     return ((completedRequiredTrainings?.length || 0) / requiredTrainings.length) * 100;
 });
 const route = useRoute();
@@ -129,7 +129,7 @@ onMounted(async () => {
                             <li v-for="training in trainings" :key="training.id"
                                 class="list-group-item d-flex justify-content-between">
                                 {{ training.title }}
-                                <span v-if="userTrainings?.some(t => t.id === training.id)" class="badge text-bg-success">
+                                <span v-if="userTrainings?.some(t => t.trainingId === training.id)" class="badge text-bg-success">
                                     Completed
                                 </span>
                                 <span v-else class="badge text-bg-warning">
