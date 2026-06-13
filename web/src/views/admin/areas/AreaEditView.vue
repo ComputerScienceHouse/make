@@ -2,7 +2,7 @@
 import type { Area } from "@/models/areas";
 import { ref, onMounted } from "vue";
 import { useRoute } from "vue-router";
-import DynamicForm from "@/components/DynamicForm.vue";
+import DynamicForm, { type FormOptions } from "@/components/DynamicForm.vue";
 import router from "@/router";
 import type { Training } from "@/models/trainings";
 import DynamicTable from "@/components/DynamicTable.vue";
@@ -17,6 +17,12 @@ const notFound = ref(false);
 const route = useRoute();
 
 const showTrainingModal = ref(false);
+
+const formOptions: FormOptions<Area> = {
+    fields: {
+        id: { hidden: true },
+    },
+}
 
 const tableOptions: TableOptions<Training> = {
     fields: {
@@ -79,7 +85,7 @@ async function saveArea(area: Area) {
 
 
 <template>
-    <AddTrainingPopup v-if="showTrainingModal && area" :areaid="area.id"  @close="showTrainingModal = false">
+    <AddTrainingPopup v-if="showTrainingModal && area" :areaid="area.id" @close="showTrainingModal = false">
     </AddTrainingPopup>
 
     <main class="container py-4" v-if="loading">
@@ -91,7 +97,7 @@ async function saveArea(area: Area) {
             <h1>Editing "{{ area?.name }}"</h1>
         </div>
 
-        <DynamicForm :data="area" :options="tableOptions" @submit="saveArea" class="mb-3"></DynamicForm>
+        <DynamicForm :data="area" :options="formOptions" @submit="saveArea" class="mb-3"></DynamicForm>
 
         <div class="d-flex justify-content-between align-items-center">
             <h1>Required Trainings:</h1>
