@@ -82,9 +82,6 @@ func (database *DatabaseHelper) GetAllAreas() ([]models.Area, error) {
 
 		areas = append(areas, area)
 	}
-	if err != nil {
-		return []models.Area{}, err
-	}
 
 	return areas, nil
 }
