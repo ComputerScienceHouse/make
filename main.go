@@ -7,12 +7,16 @@ import (
 	"makedotcsh/routes"
 	"os"
 
+	_ "makedotcsh/docs"
+
 	cshauth "github.com/computersciencehouse/csh-auth/v2"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-contrib/gzip"
 	"github.com/gin-contrib/logger"
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
 )
 
 func errorHandler(c *gin.Context) {
@@ -34,6 +38,9 @@ func serveIndex(c *gin.Context) {
 	c.File("./web/dist/index.html")
 }
 
+// @title		makedotcsh API
+// @host		localhost:8080
+// @BasePath	/api/
 func main() {
 	godotenv.Load()
 	router := gin.New()
@@ -84,6 +91,9 @@ func main() {
 		frontend.GET("/:path", serveIndex)
 		frontend.GET("/:path/*rest", serveIndex)
 	}
+
+	// swag
+	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
 	log.Println("running")
 	router.Run()

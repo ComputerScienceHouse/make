@@ -7,7 +7,16 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func test(c *gin.Context) {
+// GetAuthUser godoc
+//
+// @Summary Get authenticated user
+// @Description Returns information about the currently authenticated user
+// @Tags me
+// @Produce json
+// @Success 200 {object} csh_auth.UserInfo
+// @Failure 500 {object} models.ErrorResponse
+// @Router /me [get]
+func getAuthUser(c *gin.Context) {
 	authAny, exists := c.Get("cshauth")
 	if !exists {
 		err := errors.New("cshauth does not exist in context")
@@ -35,5 +44,5 @@ func test(c *gin.Context) {
 
 func Routes(route *gin.RouterGroup) {
 	me := route.Group("/me")
-	me.GET("/", test)
+	me.GET("/", getAuthUser)
 }

@@ -19,7 +19,7 @@ const formOptions: FormOptions<Area> = {
 }
 
 async function saveArea(area: Area) {
-    const res = await fetch(`/api/areas/create`, {
+    const res = await fetch(`/api/areas/`, {
         method: "POST",
         body: JSON.stringify(area),
         credentials: "include"

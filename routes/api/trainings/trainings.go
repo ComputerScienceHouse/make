@@ -11,6 +11,15 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// GetAllTrainings godoc
+//
+// @Summary Get all trainings
+// @Description Returns all trainings
+// @Tags trainings
+// @Produce json
+// @Success 200 {array} models.Training
+// @Failure 500 {object} models.ErrorResponse
+// @Router /trainings [get]
 func getAllTrainings(c *gin.Context) {
 	trainings, err := database.Helper.GetAllTrainings()
 	if err != nil {
@@ -21,6 +30,17 @@ func getAllTrainings(c *gin.Context) {
 	c.JSON(200, trainings)
 }
 
+// GetTraining godoc
+//
+// @Summary Get training
+// @Description Returns a training by ID
+// @Tags trainings
+// @Produce json
+// @Param id path int true "Training ID"
+// @Success 200 {object} models.Training
+// @Failure 404 {object} models.ErrorResponse
+// @Failure 500 {object} models.ErrorResponse
+// @Router /trainings/{id} [get]
 func getTraining(c *gin.Context) {
 	id, err := strconv.Atoi(c.Param("id"))
 
@@ -39,6 +59,17 @@ func getTraining(c *gin.Context) {
 	c.JSON(200, training)
 }
 
+// CreateTraining godoc
+//
+// @Summary Create training
+// @Description Create a new training
+// @Tags trainings
+// @Accept json
+// @Param training body models.CreateTrainingRequest true "Training"
+// @Success 201
+// @Failure 400 {object} models.ErrorResponse
+// @Failure 500 {object} models.ErrorResponse
+// @Router /trainings/create [post]
 func createTraining(c *gin.Context) {
 	var req models.CreateTrainingRequest
 
@@ -59,6 +90,17 @@ func createTraining(c *gin.Context) {
 	c.Status(201)
 }
 
+// GetAreaTrainings godoc
+//
+// @Summary Get area trainings
+// @Description Returns all trainings required for an area
+// @Tags trainings
+// @Produce json
+// @Param id path int true "Area ID"
+// @Success 200 {array} models.Training
+// @Failure 400 {object} models.ErrorResponse
+// @Failure 500 {object} models.ErrorResponse
+// @Router /trainings/area/{id} [get]
 func getAreaTrainings(c *gin.Context) {
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
@@ -77,6 +119,18 @@ func getAreaTrainings(c *gin.Context) {
 	c.JSON(200, trainings)
 }
 
+// AddTrainingToArea godoc
+//
+// @Summary Add trainings to area
+// @Description Associates one or more trainings with an area
+// @Tags trainings
+// @Accept json
+// @Param id path int true "Area ID"
+// @Param trainingIds body []int true "Training IDs"
+// @Success 201
+// @Failure 400 {object} models.ErrorResponse
+// @Failure 500 {object} models.ErrorResponse
+// @Router /trainings/area/{id} [post]
 func addTrainingToArea(c *gin.Context) {
 	var req []int
 	id, err := strconv.Atoi(c.Param("id"))
@@ -101,6 +155,18 @@ type RemoveTrainingRequest struct {
 	ID int `json:"id"`
 }
 
+// RemoveTrainingFromArea godoc
+//
+// @Summary Remove training from area
+// @Description Removes a training requirement from an area
+// @Tags trainings
+// @Accept json
+// @Param id path int true "Area ID"
+// @Param request body trainings.RemoveTrainingRequest true "Training removal request"
+// @Success 201
+// @Failure 400 {object} models.ErrorResponse
+// @Failure 500 {object} models.ErrorResponse
+// @Router /trainings/area/{id} [delete]
 func removeTrainingFromArea(c *gin.Context) {
 	var req RemoveTrainingRequest
 	id, err := strconv.Atoi(c.Param("id"))
@@ -121,6 +187,16 @@ func removeTrainingFromArea(c *gin.Context) {
 	c.Status(201)
 }
 
+// DeleteTraining godoc
+//
+// @Summary Delete training
+// @Description Deletes a training
+// @Tags trainings
+// @Param id path int true "Training ID"
+// @Success 204
+// @Failure 400 {object} models.ErrorResponse
+// @Failure 500 {object} models.ErrorResponse
+// @Router /trainings/{id} [delete]
 func deleteTraining(c *gin.Context) {
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
@@ -139,6 +215,18 @@ func deleteTraining(c *gin.Context) {
 	c.Status(204)
 }
 
+// UpdateTraining godoc
+//
+// @Summary Update training
+// @Description Updates an existing training
+// @Tags trainings
+// @Accept json
+// @Param id path int true "Training ID"
+// @Param training body models.CreateTrainingRequest true "Updated training"
+// @Success 204
+// @Failure 400 {object} models.ErrorResponse
+// @Failure 500 {object} models.ErrorResponse
+// @Router /trainings/{id} [put]
 func updateTraining(c *gin.Context) {
 	id, err := strconv.Atoi(c.Param("id"))
 	var req models.CreateTrainingRequest
