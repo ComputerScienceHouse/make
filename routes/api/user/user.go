@@ -1,8 +1,6 @@
 package user
 
 import (
-	"database/sql"
-	"errors"
 	"makedotcsh/database"
 	"makedotcsh/middleware"
 	"makedotcsh/models"
@@ -12,16 +10,23 @@ import (
 
 func getUserTrainings(c *gin.Context) {
 	uuid := c.Param("uuid")
-	trainings, err := database.Helper.GetUserTrainings(uuid)
 
+	userTrainings, err := database.Helper.GetUserTrainings(uuid)
 	if err != nil {
-		if errors.Is(err, sql.ErrNoRows) {
-			c.JSON(404, gin.H{"error": "training not found"})
+		c.Error(err)
+		return
+	}
+
+	trainings := []models.Training{}
+
+	for _, id := range userTrainings {
+		training, err := database.Helper.GetTraining(id)
+		if err != nil {
+			c.Error(err)
 			return
 		}
 
-		c.Error(err)
-		return
+		trainings = append(trainings, training)
 	}
 
 	c.JSON(200, trainings)
