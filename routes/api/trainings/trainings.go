@@ -139,12 +139,34 @@ func deleteTraining(c *gin.Context) {
 	c.Status(204)
 }
 
+func updateTraining(c *gin.Context) {
+	id, err := strconv.Atoi(c.Param("id"))
+	var req models.CreateTrainingRequest
+
+	err = c.ShouldBindBodyWithJSON(&req)
+	if err != nil {
+		c.JSON(400, gin.H{
+			"error": err.Error(),
+		})
+		return
+	}
+
+	err = database.Helper.UpdateTraining(req, id)
+	if err != nil {
+		c.Error(err)
+		return
+	}
+
+	c.Status(204)
+}
+
 func Routes(route *gin.RouterGroup) {
 	trainings := route.Group("/trainings")
 	trainings.GET("/", getAllTrainings)
 	trainings.GET("/:id", getTraining)
-
 	trainings.GET("/area/:id", getAreaTrainings)
+
+	trainings.PUT("/:id", middleware.RequireGroup("eboard"), updateTraining)
 
 	trainings.POST("/area/:id", middleware.RequireGroup("eboard"), addTrainingToArea)
 	trainings.POST("/create/", middleware.RequireGroup("eboard"), createTraining)

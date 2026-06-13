@@ -8,6 +8,7 @@ import { authState } from '@/auth.ts'
 import AreaCreateView from '@/views/admin/areas/AreaCreateView.vue'
 import TrainingsCreateView from '@/views/admin/trainings/TrainingsCreateView.vue'
 import TrainingsListView from '@/views/admin/trainings/TrainingsListView.vue'
+import TrainingsEditView from '@/views/admin/trainings/TrainingsEditView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -50,6 +51,12 @@ const router = createRouter({
       path: '/admin/trainings',
       name: 'trainings',
       component: TrainingsListView,
+      meta: { requiresAdmin: true }
+    },
+        {
+      path: '/admin/trainings/:id',
+      name: 'trainingsEdit',
+      component: TrainingsEditView,
       meta: { requiresAdmin: true }
     },
     {
