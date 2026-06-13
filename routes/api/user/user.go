@@ -4,6 +4,7 @@ import (
 	"makedotcsh/database"
 	"makedotcsh/middleware"
 	"makedotcsh/models"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 )
@@ -64,10 +65,31 @@ func getUserAreaAccess(c *gin.Context) {
 	c.JSON(200, areas)
 }
 
+func deleteUserTraining(c *gin.Context) {
+	id, err := strconv.Atoi(c.Param("id"))
+	uuid := c.Param("uuid")
+	if err != nil {
+		c.JSON(400, gin.H{
+			"error": err.Error(),
+		})
+		return
+	}
+
+	err = database.Helper.DeleteTrainingFromUser(id, uuid)
+	if err != nil {
+		c.Error(err)
+		return
+	}
+
+	c.Status(204)
+}
+
 func Routes(route *gin.RouterGroup) {
 	areas := route.Group("/user")
 	areas.GET("/:uuid/trainings", getUserTrainings)
 	areas.GET("/:uuid/areaAccess", getUserAreaAccess)
+
+	areas.DELETE("/:uuid/trainings/:id", middleware.RequireGroup("eboard"), deleteUserTraining)
 
 	areas.POST("/:uuid/trainings/", middleware.RequireGroup("eboard"), createUserTraining)
 }

@@ -4,3 +4,9 @@ export interface Training {
     description: string,
     questions: string,
 }
+export interface UserTraining {
+  userUuid: string;
+  trainingId: number;
+  completedAt: Date;
+  expiresAt: Date;
+}

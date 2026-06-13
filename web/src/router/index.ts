@@ -9,6 +9,7 @@ import AreaCreateView from '@/views/admin/areas/AreaCreateView.vue'
 import TrainingsCreateView from '@/views/admin/trainings/TrainingsCreateView.vue'
 import TrainingsListView from '@/views/admin/trainings/TrainingsListView.vue'
 import TrainingsEditView from '@/views/admin/trainings/TrainingsEditView.vue'
+import UserTrainingsListView from '@/views/admin/user/UserTrainingsListView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -53,7 +54,7 @@ const router = createRouter({
       component: TrainingsListView,
       meta: { requiresAdmin: true }
     },
-        {
+    {
       path: '/admin/trainings/:id',
       name: 'trainingsEdit',
       component: TrainingsEditView,
@@ -63,6 +64,12 @@ const router = createRouter({
       path: '/admin/trainings/create',
       name: 'trainingsCreate',
       component: TrainingsCreateView,
+      meta: { requiresAdmin: true }
+    },
+    {
+      path: '/admin/user/:uuid/trainings',
+      name: 'userTrainingList',
+      component: UserTrainingsListView,
       meta: { requiresAdmin: true }
     },
   ],
