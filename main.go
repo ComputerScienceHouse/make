@@ -18,9 +18,13 @@ import (
 func errorHandler(c *gin.Context) {
 	c.Next()
 
+	if c.Writer.Written() {
+		return
+	}
+
 	err := c.Errors.Last()
 	if err != nil {
-		c.JSON(500, gin.H{
+		c.AbortWithStatusJSON(500, gin.H{
 			"error": "Internal server error",
 		})
 	}
