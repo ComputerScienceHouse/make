@@ -315,3 +315,16 @@ func (database *DatabaseHelper) GetAllAreasWithUserAccess(uuid string) ([]int, e
 
 	return areas, nil
 }
+
+func (database *DatabaseHelper) DeleteTraining(trainingID int) error {
+	_, err := database.DB.Exec(
+		"DELETE FROM trainings WHERE id = ?",
+		trainingID,
+	)
+
+	if err != nil {
+		return err
+	}
+
+	return nil
+}

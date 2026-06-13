@@ -22,6 +22,12 @@ const sections = [
         title: "Trainings",
         items: [
             {
+                title: "Trainings",
+                description: "Manage trainings.",
+                path: "/admin/trainings",
+                icon: "bi-rulers"
+            },
+            {
                 title: "Create Trainings",
                 description: "Create a new training.",
                 path: "/admin/trainings/create",

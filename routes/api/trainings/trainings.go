@@ -121,6 +121,24 @@ func removeTrainingFromArea(c *gin.Context) {
 	c.Status(201)
 }
 
+func deleteTraining(c *gin.Context) {
+	id, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		c.JSON(400, gin.H{
+			"error": err.Error(),
+		})
+		return
+	}
+
+	err = database.Helper.DeleteTraining(id)
+	if err != nil {
+		c.Error(err)
+		return
+	}
+
+	c.Status(204)
+}
+
 func Routes(route *gin.RouterGroup) {
 	areas := route.Group("/trainings")
 	areas.GET("/", getAllTrainings)
@@ -132,4 +150,5 @@ func Routes(route *gin.RouterGroup) {
 	areas.POST("/create/", middleware.RequireGroup("eboard"), createTraining)
 
 	areas.DELETE("/area/:id", middleware.RequireGroup("eboard"), removeTrainingFromArea)
+	areas.DELETE("/:id", middleware.RequireGroup("eboard"), deleteTraining)
 }
