@@ -69,7 +69,7 @@ func getArea(c *gin.Context) {
 // @Success 201
 // @Failure 400 {object} models.ErrorResponse
 // @Failure 500 {object} models.ErrorResponse
-// @Router /areas/create [post]
+// @Router /areas [post]
 func createArea(c *gin.Context) {
 	var req models.CreateAreaRequest
 

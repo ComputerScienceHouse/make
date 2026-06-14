@@ -15,6 +15,165 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
+        "/areas": {
+            "get": {
+                "description": "Returns all areas",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "areas"
+                ],
+                "summary": "Get all areas",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.Area"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "Creates a new area",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "areas"
+                ],
+                "summary": "Create area",
+                "parameters": [
+                    {
+                        "description": "Area",
+                        "name": "area",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.CreateAreaRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created"
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/areas/{id}": {
+            "get": {
+                "description": "Returns an area by ID",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "areas"
+                ],
+                "summary": "Get area",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Area ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.Area"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "description": "Updates an existing area",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "areas"
+                ],
+                "summary": "Update area",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Area ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Updated area",
+                        "name": "area",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.CreateAreaRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No Content"
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/me": {
             "get": {
                 "description": "Returns information about the currently authenticated user",
@@ -143,11 +302,6 @@ const docTemplate = `{
                 }
             },
             "post": {
-                "security": [
-                    {
-                        "BasicAuth": []
-                    }
-                ],
                 "description": "Associates one or more trainings with an area",
                 "consumes": [
                     "application/json"
@@ -196,11 +350,6 @@ const docTemplate = `{
                 }
             },
             "delete": {
-                "security": [
-                    {
-                        "BasicAuth": []
-                    }
-                ],
                 "description": "Removes a training requirement from an area",
                 "consumes": [
                     "application/json"
@@ -248,11 +397,6 @@ const docTemplate = `{
         },
         "/trainings/create": {
             "post": {
-                "security": [
-                    {
-                        "BasicAuth": []
-                    }
-                ],
                 "description": "Create a new training",
                 "consumes": [
                     "application/json"
@@ -332,11 +476,6 @@ const docTemplate = `{
                 }
             },
             "put": {
-                "security": [
-                    {
-                        "BasicAuth": []
-                    }
-                ],
                 "description": "Updates an existing training",
                 "consumes": [
                     "application/json"
@@ -382,11 +521,6 @@ const docTemplate = `{
                 }
             },
             "delete": {
-                "security": [
-                    {
-                        "BasicAuth": []
-                    }
-                ],
                 "description": "Deletes a training",
                 "tags": [
                     "trainings"
@@ -452,6 +586,43 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "uuid": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.Area": {
+            "type": "object",
+            "properties": {
+                "description": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "ldapGroup": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "photourl": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.CreateAreaRequest": {
+            "type": "object",
+            "properties": {
+                "description": {
+                    "type": "string"
+                },
+                "ldapGroup": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "photourl": {
                     "type": "string"
                 }
             }

@@ -22,6 +22,30 @@ definitions:
       uuid:
         type: string
     type: object
+  models.Area:
+    properties:
+      description:
+        type: string
+      id:
+        type: integer
+      ldapGroup:
+        type: string
+      name:
+        type: string
+      photourl:
+        type: string
+    type: object
+  models.CreateAreaRequest:
+    properties:
+      description:
+        type: string
+      ldapGroup:
+        type: string
+      name:
+        type: string
+      photourl:
+        type: string
+    type: object
   models.CreateTrainingRequest:
     properties:
       description:
@@ -55,6 +79,111 @@ info:
   contact: {}
   title: makedotcsh API
 paths:
+  /areas:
+    get:
+      description: Returns all areas
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Area'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: Get all areas
+      tags:
+      - areas
+    post:
+      consumes:
+      - application/json
+      description: Creates a new area
+      parameters:
+      - description: Area
+        in: body
+        name: area
+        required: true
+        schema:
+          $ref: '#/definitions/models.CreateAreaRequest'
+      responses:
+        "201":
+          description: Created
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: Create area
+      tags:
+      - areas
+  /areas/{id}:
+    get:
+      description: Returns an area by ID
+      parameters:
+      - description: Area ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Area'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: Get area
+      tags:
+      - areas
+    put:
+      consumes:
+      - application/json
+      description: Updates an existing area
+      parameters:
+      - description: Area ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Updated area
+        in: body
+        name: area
+        required: true
+        schema:
+          $ref: '#/definitions/models.CreateAreaRequest'
+      responses:
+        "204":
+          description: No Content
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: Update area
+      tags:
+      - areas
   /me:
     get:
       description: Returns information about the currently authenticated user
@@ -130,8 +259,6 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/models.ErrorResponse'
-      security:
-      - BasicAuth: []
       summary: Delete training
       tags:
       - trainings
@@ -188,8 +315,6 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/models.ErrorResponse'
-      security:
-      - BasicAuth: []
       summary: Update training
       tags:
       - trainings
@@ -221,8 +346,6 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/models.ErrorResponse'
-      security:
-      - BasicAuth: []
       summary: Remove training from area
       tags:
       - trainings
@@ -283,8 +406,6 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/models.ErrorResponse'
-      security:
-      - BasicAuth: []
       summary: Add trainings to area
       tags:
       - trainings
@@ -311,8 +432,6 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/models.ErrorResponse'
-      security:
-      - BasicAuth: []
       summary: Create training
       tags:
       - trainings
