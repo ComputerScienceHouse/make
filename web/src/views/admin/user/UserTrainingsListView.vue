@@ -25,7 +25,7 @@ const tableOptions: TableOptions<UserTraining> = {
                 if (!selectedMember.value) return;
 
                 const res = await fetch(
-                    `/api/user/${selectedMember.value.uuid}/${training.trainingId}`,
+                    `/api/user/${selectedMember.value.uuid}/trainings/${training.trainingId}`,
                     {
                         method: "DELETE",
                         credentials: "include"
