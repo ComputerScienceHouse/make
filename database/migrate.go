@@ -1,19 +1,19 @@
 package database
 
 import (
+	"database/sql"
 	"embed"
 	"log"
 
 	"github.com/golang-migrate/migrate/v4"
+	"github.com/golang-migrate/migrate/v4/database/postgres"
 	"github.com/golang-migrate/migrate/v4/source/iofs"
-
-	_ "github.com/golang-migrate/migrate/v4/database/sqlite"
 )
 
 //go:embed migrations/*.sql
 var migrations embed.FS
 
-func Migrate() error {
+func Migrate(db *sql.DB) error {
 	log.Println("[DB] Beginning database migration")
 
 	source, err := iofs.New(migrations, "migrations")
@@ -24,10 +24,17 @@ func Migrate() error {
 
 	log.Println("[DB] Running migrations...")
 
-	m, err := migrate.NewWithSourceInstance(
+	driver, err := postgres.WithInstance(db, &postgres.Config{})
+	if err != nil {
+		log.Printf("[DB] Failed to create postgres driver: %v\n", err)
+		return err
+	}
+
+	m, err := migrate.NewWithInstance(
 		"iofs",
 		source,
-		"sqlite://database.db",
+		"postgres",
+		driver,
 	)
 	if err != nil {
 		log.Printf("[DB] Failed to create migrator: %v\n", err)

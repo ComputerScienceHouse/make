@@ -45,6 +45,9 @@ onMounted(async () => {
 });
 
 async function saveTraining(training: Training) {
+    // TODO: error handling
+    training.questions = JSON.parse(training.questions)
+
     const res = await fetch(`/api/trainings/${training.id}`, {
         method: "PUT",
         body: JSON.stringify(training),

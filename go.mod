@@ -11,6 +11,7 @@ require (
 	github.com/go-ldap/ldap/v3 v3.4.13
 	github.com/golang-migrate/migrate/v4 v4.19.1
 	github.com/joho/godotenv v1.5.1
+	github.com/lib/pq v1.10.9
 	github.com/mattn/go-sqlite3 v1.14.45
 	github.com/swaggo/files v1.0.1
 	github.com/swaggo/gin-swagger v1.6.1

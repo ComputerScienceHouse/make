@@ -1,20 +1,21 @@
 package models
 
 import (
+	"encoding/json"
 	"time"
 )
 
 type Training struct {
-	ID          int    `json:"id"`
-	Title       string `json:"title"`
-	Description string `json:"description"`
-	Questions   any    `json:"questions"`
+	ID          int             `json:"id"`
+	Title       string          `json:"title"`
+	Description string          `json:"description"`
+	Questions   json.RawMessage `json:"questions"`
 }
 
 type CreateTrainingRequest struct {
-	Title       string `json:"title"`
-	Description string `json:"description"`
-	Questions   any    `json:"questions"`
+	Title       string          `json:"title"`
+	Description string          `json:"description"`
+	Questions   json.RawMessage `json:"questions"`
 }
 
 type UserTraining struct {

@@ -51,6 +51,7 @@ func main() {
 
 	// init db
 	database.Init()
+	defer database.DB.Close()
 
 	// init auth
 	auth, err := cshauth.Init(

@@ -2,10 +2,13 @@ package database
 
 import (
 	"database/sql"
+	"fmt"
 	"log"
 	"makedotcsh/models"
+	"net/url"
+	"os"
 
-	_ "github.com/mattn/go-sqlite3"
+	_ "github.com/lib/pq"
 )
 
 var DB *sql.DB
@@ -17,9 +20,15 @@ type DatabaseHelper struct {
 var Helper *DatabaseHelper
 
 func Init() {
-	var err error
+	var DB *sql.DB
 
-	DB, err = sql.Open("sqlite3", "database.db?_foreign_keys=on")
+	host := os.Getenv("MAKE_DB_HOST")
+	name := os.Getenv("MAKE_DB_NAME")
+	user := os.Getenv("MAKE_DB_USER")
+	pass := os.Getenv("MAKE_DB_PASS")
+	dbOptions := fmt.Sprintf("postgres://%s:%s@%s/%s", url.QueryEscape(user), url.QueryEscape(pass), host, url.PathEscape(name))
+
+	DB, err := sql.Open("postgres", dbOptions)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -29,7 +38,7 @@ func Init() {
 		log.Fatal(err)
 	}
 
-	err = Migrate()
+	err = Migrate(DB)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -38,7 +47,7 @@ func Init() {
 }
 
 func (database *DatabaseHelper) GetArea(areaID int) (models.Area, error) {
-	row := database.DB.QueryRow("SELECT id, name, description, ldapgroup, photourl FROM areas WHERE id = ?", areaID)
+	row := database.DB.QueryRow("SELECT id, name, description, ldapgroup, photourl FROM areas WHERE id = $1", areaID)
 
 	var area models.Area
 
@@ -88,7 +97,7 @@ func (database *DatabaseHelper) GetAllAreas() ([]models.Area, error) {
 
 func (database *DatabaseHelper) CreateArea(area models.CreateAreaRequest) error {
 	_, err := database.DB.Exec(
-		"INSERT INTO areas (name, description, ldapgroup, photourl) VALUES (?, ?, ?, ?)",
+		"INSERT INTO areas (name, description, ldapgroup, photourl) VALUES ($1, $2, $3, $4)",
 		area.Name,
 		area.Description,
 		area.LdapGroup,
@@ -104,7 +113,7 @@ func (database *DatabaseHelper) CreateArea(area models.CreateAreaRequest) error 
 
 func (database *DatabaseHelper) UpdateArea(area models.CreateAreaRequest, id int) error {
 	_, err := database.DB.Exec(
-		"UPDATE areas SET name = ?, description = ?, ldapgroup = ?, photourl = ? WHERE id = ?",
+		"UPDATE areas SET name = $1, description = $2, ldapgroup = $3, photourl = $4 WHERE id = $5",
 		area.Name,
 		area.Description,
 		area.LdapGroup,
@@ -120,7 +129,7 @@ func (database *DatabaseHelper) UpdateArea(area models.CreateAreaRequest, id int
 }
 
 func (database *DatabaseHelper) GetTraining(trainingID int) (models.Training, error) {
-	row := database.DB.QueryRow("SELECT id, title, description, questions FROM trainings WHERE id = ?", trainingID)
+	row := database.DB.QueryRow("SELECT id, title, description, questions FROM trainings WHERE id = $1", trainingID)
 
 	var training models.Training
 
@@ -171,7 +180,7 @@ func (database *DatabaseHelper) GetAllTrainings() ([]models.Training, error) {
 
 func (database *DatabaseHelper) CreateTraining(training models.CreateTrainingRequest) error {
 	_, err := database.DB.Exec(
-		"INSERT INTO trainings (title, description, questions) VALUES (?, ?, ?)",
+		"INSERT INTO trainings (title, description, questions) VALUES ($1, $2, $3)",
 		training.Title,
 		training.Description,
 		training.Questions,
@@ -186,7 +195,7 @@ func (database *DatabaseHelper) CreateTraining(training models.CreateTrainingReq
 
 func (database *DatabaseHelper) UpdateTraining(training models.CreateTrainingRequest, trainingId int) error {
 	_, err := database.DB.Exec(
-		"UPDATE trainings SET title = ?, description = ?, questions = ? WHERE id = ?",
+		"UPDATE trainings SET title = $1, description = $2, questions = $3 WHERE id = $4",
 		training.Title,
 		training.Description,
 		training.Questions,
@@ -206,7 +215,7 @@ type dbAreaTraining struct {
 }
 
 func (database *DatabaseHelper) GetAreaTrainings(area int) ([]models.Training, error) {
-	rows, err := database.DB.Query("SELECT training_id FROM area_trainings WHERE area_id = ?", area)
+	rows, err := database.DB.Query("SELECT training_id FROM area_trainings WHERE area_id = $1", area)
 	if err != nil {
 		return []models.Training{}, nil
 	}
@@ -238,7 +247,7 @@ func (database *DatabaseHelper) GetAreaTrainings(area int) ([]models.Training, e
 
 func (database *DatabaseHelper) CreateUserTraining(training models.UserTraining) error {
 	_, err := database.DB.Exec(
-		"INSERT INTO user_trainings (user_uuid, training_id, completed_at, expires_at) VALUES (?, ?, ?, ?)",
+		"INSERT INTO user_trainings (user_uuid, training_id, completed_at, expires_at) VALUES ($1, $2, $3, $4)",
 		training.UserUUID,
 		training.TrainingID,
 		training.CompletedAt,
@@ -253,7 +262,7 @@ func (database *DatabaseHelper) CreateUserTraining(training models.UserTraining)
 }
 
 func (database *DatabaseHelper) GetCompletedUserTrainings(uuid string) ([]int, error) {
-	rows, err := database.DB.Query("SELECT user_uuid, training_id, completed_at, expires_at FROM user_trainings WHERE user_uuid = ?", uuid)
+	rows, err := database.DB.Query("SELECT user_uuid, training_id, completed_at, expires_at FROM user_trainings WHERE user_uuid = $1", uuid)
 	if err != nil {
 		return []int{}, err
 	}
@@ -281,7 +290,7 @@ func (database *DatabaseHelper) GetCompletedUserTrainings(uuid string) ([]int, e
 }
 
 func (database *DatabaseHelper) GetUserTraining(trainingID int) (models.UserTraining, error) {
-	row := database.DB.QueryRow("SELECT user_uuid, training_id, completed_at, expires_at FROM user_trainings WHERE training_id = ?", trainingID)
+	row := database.DB.QueryRow("SELECT user_uuid, training_id, completed_at, expires_at FROM user_trainings WHERE training_id = $1", trainingID)
 
 	var training models.UserTraining
 
@@ -301,7 +310,7 @@ func (database *DatabaseHelper) GetUserTraining(trainingID int) (models.UserTrai
 
 func (database *DatabaseHelper) DeleteTrainingFromUser(trainingID int, uuid string) error {
 	_, err := database.DB.Exec(
-		"DELETE FROM user_trainings WHERE user_uuid = ? AND training_id = ?",
+		"DELETE FROM user_trainings WHERE user_uuid = $1 AND training_id = $2",
 		uuid,
 		trainingID,
 	)
@@ -316,7 +325,7 @@ func (database *DatabaseHelper) DeleteTrainingFromUser(trainingID int, uuid stri
 func (database *DatabaseHelper) AddTrainingsToArea(areaID int, trainingIDs []int) error {
 	for _, trainingID := range trainingIDs {
 		_, err := database.DB.Exec(
-			"INSERT INTO area_trainings (area_id, training_id) VALUES (?, ?)",
+			"INSERT INTO area_trainings (area_id, training_id) VALUES ($1, $2)",
 			areaID, trainingID,
 		)
 
@@ -330,7 +339,7 @@ func (database *DatabaseHelper) AddTrainingsToArea(areaID int, trainingIDs []int
 
 func (database *DatabaseHelper) RemoveTrainingFromArea(areaID int, trainingID int) error {
 	_, err := database.DB.Exec(
-		"DELETE FROM area_trainings WHERE area_id = ? AND training_id = ?",
+		"DELETE FROM area_trainings WHERE area_id = $1 AND training_id = $2",
 		areaID, trainingID,
 	)
 
@@ -342,7 +351,7 @@ func (database *DatabaseHelper) RemoveTrainingFromArea(areaID int, trainingID in
 
 func (database *DatabaseHelper) GetAllAreasWithUserAccess(uuid string) ([]int, error) {
 	// insane query god bless sql (this was 100 lines of logic beforehand)
-	query := "SELECT a.id FROM areas a JOIN area_trainings at ON at.area_id = a.id LEFT JOIN user_trainings ut ON ut.training_id = at.training_id AND ut.user_uuid = ? GROUP BY a.id, a.name HAVING COUNT(DISTINCT at.training_id) = COUNT(DISTINCT ut.training_id)"
+	query := "SELECT a.id FROM areas a JOIN area_trainings at ON at.area_id = a.id LEFT JOIN user_trainings ut ON ut.training_id = at.training_id AND ut.user_uuid = $1 GROUP BY a.id, a.name HAVING COUNT(DISTINCT at.training_id) = COUNT(DISTINCT ut.training_id)"
 	rows, err := database.DB.Query(query, uuid)
 	if err != nil {
 		return []int{}, err
@@ -367,7 +376,7 @@ func (database *DatabaseHelper) GetAllAreasWithUserAccess(uuid string) ([]int, e
 
 func (database *DatabaseHelper) DeleteTraining(trainingID int) error {
 	_, err := database.DB.Exec(
-		"DELETE FROM trainings WHERE id = ?",
+		"DELETE FROM trainings WHERE id = $1",
 		trainingID,
 	)
 
