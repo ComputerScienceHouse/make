@@ -12,8 +12,8 @@ const answers = ref<Record<string, string | number | boolean>>({})
 
 function addQuestion() {
   const questions = training.value.questions
-  const lastId = questions[questions.length-1]?.id ?? 0
-  const nextIndex = lastId + 1 
+  const lastId = questions[questions.length - 1]?.id ?? 0
+  const nextIndex = lastId + 1
 
   training.value.questions.push({
     id: nextIndex,
@@ -25,7 +25,10 @@ function addQuestion() {
   })
 }
 
-function changeQuestionToDifferentType(question: QuestionWithAnswer, newType: QuestionWithAnswer['type']): QuestionWithAnswer {
+function changeQuestionToDifferentType(
+  question: QuestionWithAnswer,
+  newType: QuestionWithAnswer['type'],
+): QuestionWithAnswer {
   const base = {
     id: question.id,
     label: question.label,
@@ -34,16 +37,16 @@ function changeQuestionToDifferentType(question: QuestionWithAnswer, newType: Qu
 
   switch (newType) {
     case 'text':
-      return { ...base, type: 'text', answer: "" }
+      return { ...base, type: 'text', answer: '' }
 
     case 'textarea':
-      return { ...base, type: 'textarea', answer: ""  }
+      return { ...base, type: 'textarea', answer: '' }
 
     case 'number':
-      return { ...base, type: 'number', answer: 1  }
+      return { ...base, type: 'number', answer: 1 }
 
     case 'radio':
-      return { ...base, type: 'radio', options: ['New Option'], answer: "New Option" }
+      return { ...base, type: 'radio', options: ['New Option'], answer: 'New Option' }
 
     case 'checkbox':
       return { ...base, type: 'checkbox', answer: true }
