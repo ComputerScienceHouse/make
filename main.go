@@ -1,10 +1,12 @@
 package main
 
 import (
+	"embed"
 	"fmt"
 	"log"
 	"makedotcsh/database"
 	"makedotcsh/routes"
+	"net/http"
 	"os"
 
 	_ "makedotcsh/docs"
@@ -18,6 +20,9 @@ import (
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
 )
+
+//go:embed web/dist
+var staticFS embed.FS
 
 func errorHandler(c *gin.Context) {
 	c.Next()
@@ -35,7 +40,7 @@ func errorHandler(c *gin.Context) {
 }
 
 func serveIndex(c *gin.Context) {
-	c.File("./web/dist/index.html")
+	c.FileFromFS("./web/dist/index.html", http.FS(staticFS))
 }
 
 // @title		makedotcsh API
