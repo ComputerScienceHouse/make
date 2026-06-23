@@ -9,7 +9,7 @@ const training = ref<Training>({
   id: 0, // id is ignored by api when creating a new area
   title: "",
   description: "",
-  questions: "",
+  questions: [],
 })
 
 const formOptions: FormOptions<Training> = {
