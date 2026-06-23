@@ -1,9 +1,7 @@
 <script setup lang="ts">
 import type { Question, RadioQuestion, Training } from "@/models/trainings";
 import { ref } from "vue";
-import { useRoute } from "vue-router";
 
-const notFound = ref(false);
 const training = ref<Training>({
     id: 0,
     title: "New Training",
@@ -11,8 +9,6 @@ const training = ref<Training>({
     questions: []
 });
 const answers = ref<Record<string, string | number | boolean>>({})
-
-const route = useRoute();
 
 function addQuestion() {
     training.value.questions.push({

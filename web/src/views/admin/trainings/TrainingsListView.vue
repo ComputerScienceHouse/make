@@ -1,13 +1,11 @@
 <script setup lang="ts">
 import DynamicTable from "@/components/DynamicTable.vue";
-import type { Area } from "@/models/areas";
 import type { TableOptions } from '@/components/DynamicTable.vue'
 import { ref, onMounted } from "vue";
 import type { Training } from "@/models/trainings";
 
 const trainings = ref<Training[]>([]);
 const loading = ref(true);
-const notFound = ref(false);
 
 const tableOptions: TableOptions<Training> = {
     actions:  {

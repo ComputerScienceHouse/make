@@ -1,8 +1,7 @@
 <script setup lang="ts">
 import { authState } from "@/auth";
-import type { Area } from "@/models/areas";
 import type { Training, UserTraining } from "@/models/trainings";
-import { ref, onMounted, computed } from "vue";
+import { ref, onMounted } from "vue";
 import { useRoute } from "vue-router";
 
 const user = authState.user;

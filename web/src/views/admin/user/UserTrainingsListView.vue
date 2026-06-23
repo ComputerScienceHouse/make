@@ -3,10 +3,10 @@ import DynamicTable from "@/components/DynamicTable.vue";
 import AddTrainingToUserPopup from "@/components/AddTrainingToUserPopup.vue";
 
 import type { TableOptions } from "@/components/DynamicTable.vue";
-import type { Training, UserTraining } from "@/models/trainings";
+import type { UserTraining } from "@/models/trainings";
 import type { Member } from "@/models/member";
 
-import { ref, onMounted, computed } from "vue";
+import { ref, onMounted } from "vue";
 
 const members = ref<Member[]>([]);
 const selectedMember = ref<Member>();

@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import type { Area } from "@/models/areas";
 import { ref } from "vue";
 import DynamicForm, { type FormOptions } from "@/components/DynamicForm.vue";
 import router from "@/router";
