@@ -6,10 +6,11 @@ import { useRoute } from 'vue-router'
 
 const user = authState.user
 
-const training = ref<Training | null>(null)
-const userTrainings = ref<UserTraining[] | null>(null)
+const training = ref<Training>()
+const userTrainings = ref<UserTraining[]>([])
 const loading = ref(true)
 const notFound = ref(false)
+const completedTraining = ref(-1) // -1 not found, otherwise index of array
 
 const answers = ref<Record<string, string | number | boolean>>({})
 
@@ -34,6 +35,9 @@ onMounted(async () => {
 
     training.value = await trainingRes.json()
     userTrainings.value = await userTrainingsRes.json()
+
+    completedTraining.value =
+      userTrainings.value?.findIndex((m) => m.trainingId === training.value?.id) ?? -1
   } catch (err) {
     console.error(err)
   } finally {
@@ -45,6 +49,22 @@ onMounted(async () => {
 <template>
   <main class="container py-4" v-if="loading">
     <h1>Loading...</h1>
+  </main>
+
+  <main class="container py-5" v-else-if="completedTraining !== -1">
+    <div class="text-center">
+      <div>
+        <h1 class="h2 mb-3">You've completed this training</h1>
+        <p class="text-muted mb-4">No need to do it again</p>
+
+        <div>
+          <div class="small text-muted mb-1">Expires At</div>
+          <div class="fw-semibold">
+            {{ new Date(userTrainings[completedTraining]!.expiresAt).toLocaleString() }}
+          </div>
+        </div>
+      </div>
+    </div>
   </main>
 
   <main class="container py-4" v-else-if="training">
