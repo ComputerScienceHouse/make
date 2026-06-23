@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import type { Question, RadioQuestion, Training } from '@/models/trainings'
+import type { Question, QuestionWithAnswer, RadioQuestion, TrainingFull } from '@/models/trainings'
 import { ref } from 'vue'
 
-const training = ref<Training>({
+const training = ref<TrainingFull>({
   id: 0,
   title: 'New Training',
   description: 'Gets to creating!',
@@ -11,16 +11,21 @@ const training = ref<Training>({
 const answers = ref<Record<string, string | number | boolean>>({})
 
 function addQuestion() {
+  const questions = training.value.questions
+  const lastId = questions[questions.length-1]?.id ?? 0
+  const nextIndex = lastId + 1 
+
   training.value.questions.push({
-    id: 'q1',
+    id: nextIndex,
     label: 'New Question',
     required: true,
     type: 'radio',
     options: ['Answer'],
+    answer: 'Answer',
   })
 }
 
-function changeQuestionToDifferentType(question: Question, newType: Question['type']): Question {
+function changeQuestionToDifferentType(question: QuestionWithAnswer, newType: QuestionWithAnswer['type']): QuestionWithAnswer {
   const base = {
     id: question.id,
     label: question.label,
@@ -29,20 +34,24 @@ function changeQuestionToDifferentType(question: Question, newType: Question['ty
 
   switch (newType) {
     case 'text':
-      return { ...base, type: 'text' }
+      return { ...base, type: 'text', answer: "" }
 
     case 'textarea':
-      return { ...base, type: 'textarea' }
+      return { ...base, type: 'textarea', answer: ""  }
 
     case 'number':
-      return { ...base, type: 'number' }
+      return { ...base, type: 'number', answer: 1  }
 
     case 'radio':
-      return { ...base, type: 'radio', options: ['New Option'] }
+      return { ...base, type: 'radio', options: ['New Option'], answer: "New Option" }
 
     case 'checkbox':
-      return { ...base, type: 'checkbox' }
+      return { ...base, type: 'checkbox', answer: true }
   }
+}
+
+function deleteQuestion(index: number) {
+  training.value.questions.splice(index, 1)
 }
 
 function addOptionToRadioQuestion(question: RadioQuestion) {
@@ -74,22 +83,22 @@ function addOptionToRadioQuestion(question: RadioQuestion) {
         class="mb-4 p-3 border rounded shadow-sm d-flex justify-content-between"
       >
         <div>
-          <label :for="q.id" class="form-label fs-6">
+          <label :for="`${q.id}`" class="form-label fs-6">
             <input type="text" v-model="q.label" class="underline-input" />
             <span v-if="q.required" class="text-danger">*</span>
           </label>
 
           <textarea
             v-if="q.type === 'textarea'"
-            :id="q.id"
-            v-model="answers[q.id] as string"
+            :id="`${q.id}`"
+            v-model="q.answer"
             class="form-control"
           ></textarea>
 
           <input
             v-else-if="q.type === 'number'"
-            :id="q.id"
-            v-model.number="answers[q.id]"
+            :id="`${q.id}`"
+            v-model.number="q.answer"
             type="number"
             class="form-control"
             :required="q.required"
@@ -101,8 +110,8 @@ function addOptionToRadioQuestion(question: RadioQuestion) {
                 type="radio"
                 :id="option"
                 :value="option"
-                :name="q.id"
-                v-model="answers[q.id]"
+                :name="`${q.id}`"
+                v-model="q.answer"
                 class="form-check-input pretty-radio"
               />
 
@@ -118,7 +127,7 @@ function addOptionToRadioQuestion(question: RadioQuestion) {
           </div>
 
           <div v-else-if="q.type === 'checkbox'" class="form-check">
-            <input :id="q.id" v-model="answers[q.id]" type="checkbox" class="form-check-input" />
+            <input :id="`${q.id}`" v-model="q.answer" type="checkbox" class="form-check-input" />
           </div>
         </div>
 
@@ -140,6 +149,12 @@ function addOptionToRadioQuestion(question: RadioQuestion) {
           <div class="form-check mt-2">
             <input type="checkbox" id="required" class="form-check-input" v-model="q.required" />
             <label for="required" class="form-check-label">Required?</label>
+          </div>
+
+          <div class="mt-2 text-end">
+            <button id="deleteButton" class="btn btn-danger" @click="deleteQuestion(i)">
+              <i class="bi bi-trash"></i>
+            </button>
           </div>
         </div>
       </div>

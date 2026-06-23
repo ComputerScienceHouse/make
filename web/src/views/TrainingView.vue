@@ -83,21 +83,21 @@ onMounted(async () => {
 
     <form>
       <div v-for="q in training.questions" :key="q.id" class="mb-4 p-3 border rounded shadow-sm">
-        <label :for="q.id" class="form-label fs-6">
+        <label :for="`${q.id}`" class="form-label fs-6">
           {{ q.label }}
           <span v-if="q.required" class="text-danger">*</span>
         </label>
 
         <textarea
           v-if="q.type === 'textarea'"
-          :id="q.id"
+          :id="`${q.id}`"
           v-model="answers[q.id] as string"
           class="form-control"
         ></textarea>
 
         <input
           v-else-if="q.type === 'number'"
-          :id="q.id"
+          :id="`${q.id}`"
           v-model.number="answers[q.id]"
           type="number"
           class="form-control"
@@ -110,7 +110,7 @@ onMounted(async () => {
               type="radio"
               :id="option"
               :value="option"
-              :name="q.id"
+              :name="`${q.id}`"
               v-model="answers[q.id]"
               class="form-check-input pretty-radio"
             />
@@ -119,7 +119,7 @@ onMounted(async () => {
         </div>
 
         <div v-else-if="q.type === 'checkbox'" class="form-check">
-          <input :id="q.id" v-model="answers[q.id]" type="checkbox" class="form-check-input" />
+          <input :id="`${q.id}`" v-model="answers[q.id]" type="checkbox" class="form-check-input" />
         </div>
       </div>
 

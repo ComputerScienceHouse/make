@@ -1,5 +1,5 @@
 type BaseQuestion = {
-  id: string
+  id: number
   label: string
   required?: boolean
 }
@@ -32,12 +32,27 @@ export type Question =
   | RadioQuestion
   | CheckboxQuestion
 
+export type QuestionWithAnswer =
+  | (TextQuestion & { answer: string })
+  | (BigTextQuestion & { answer: string })
+  | (NumberQuestion & { answer: number })
+  | (RadioQuestion & { answer: string })
+  | (CheckboxQuestion & { answer: boolean })
+
 export interface Training {
   id: number
   title: string
   description: string
   questions: Question[]
 }
+
+export interface TrainingFull {
+  id: number
+  title: string
+  description: string
+  questions: QuestionWithAnswer[]
+}
+
 export interface UserTraining {
   userUuid: string
   trainingId: number
