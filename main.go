@@ -2,12 +2,13 @@ package main
 
 import (
 	"embed"
-	"fmt"
+	"io/fs"
 	"log"
 	"makedotcsh/database"
 	"makedotcsh/routes"
 	"net/http"
 	"os"
+	"strings"
 
 	_ "makedotcsh/docs"
 
@@ -21,8 +22,10 @@ import (
 	ginSwagger "github.com/swaggo/gin-swagger"
 )
 
-//go:embed web/dist
+//go:embed web/dist/*
 var staticFS embed.FS
+var distFS fs.FS
+var assetsFS fs.FS
 
 func errorHandler(c *gin.Context) {
 	c.Next()
@@ -40,7 +43,13 @@ func errorHandler(c *gin.Context) {
 }
 
 func serveIndex(c *gin.Context) {
-	c.FileFromFS("./web/dist/index.html", http.FS(staticFS))
+	data, err := fs.ReadFile(distFS, "index.html")
+	if err != nil {
+		c.String(500, err.Error())
+		return
+	}
+
+	c.Data(200, "text/html; charset=utf-8", data)
 }
 
 // @title		makedotcsh API
@@ -52,7 +61,17 @@ func main() {
 
 	host := os.Getenv("MAKE_HOST")
 
-	fmt.Println(os.Getenv("MAKE_OIDC_ID"))
+	var err error
+	// init embed fs
+	distFS, err = fs.Sub(staticFS, "web/dist")
+	if err != nil {
+		panic(err)
+	}
+
+	assetsFS, err = fs.Sub(distFS, "assets")
+	if err != nil {
+		panic(err)
+	}
 
 	// init db
 	database.Init()
@@ -86,21 +105,23 @@ func main() {
 	routes.SetRoutes(router, auth)
 
 	// frontend
-	frontend := router.Group("/")
-	frontend.Use(auth.CookieMiddleware())
-
 	if os.Getenv("DEV") == "true" {
 		router.NoRoute(auth.CookieMiddleware(), createViteProxy())
 	} else {
-		frontend.Static("/assets", "./web/dist/assets")
-		frontend.GET("/", serveIndex)
-		frontend.GET("/:path", serveIndex)
-		frontend.GET("/:path/*rest", serveIndex)
+		router.StaticFS("/assets", http.FS(assetsFS))
+
+		router.NoRoute(auth.CookieMiddleware(), func(c *gin.Context) {
+			if strings.HasPrefix(c.Request.URL.Path, "/api") {
+				c.JSON(404, gin.H{"error": "not found"})
+				return
+			}
+			serveIndex(c)
+		})
 	}
 
 	// swag
 	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
 	log.Println("running")
-	router.Run()
+	log.Fatal(router.Run())
 }
