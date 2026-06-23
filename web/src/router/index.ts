@@ -24,9 +24,9 @@ const router = createRouter({
     {
       path: '/areas/:id',
       name: 'area',
-      component: AreaView
+      component: AreaView,
     },
-        {
+    {
       path: '/training/:id',
       name: 'training',
       component: TrainingView,
@@ -35,54 +35,54 @@ const router = createRouter({
       path: '/admin',
       name: 'admin',
       component: AdminDashboardView,
-      meta: { requiresAdmin: true }
+      meta: { requiresAdmin: true },
     },
     {
       path: '/admin/areas',
       name: 'areas',
       component: AreaListView,
-      meta: { requiresAdmin: true }
+      meta: { requiresAdmin: true },
     },
     {
       path: '/admin/areas/:id',
       name: 'areaEdit',
       component: AreaEditView,
-      meta: { requiresAdmin: true }
+      meta: { requiresAdmin: true },
     },
     {
       path: '/admin/areas/create',
       name: 'areaCreate',
       component: AreaCreateView,
-      meta: { requiresAdmin: true }
+      meta: { requiresAdmin: true },
     },
     {
       path: '/admin/trainings',
       name: 'trainings',
       component: TrainingsListView,
-      meta: { requiresAdmin: true }
+      meta: { requiresAdmin: true },
     },
     {
       path: '/admin/trainings/:id',
       name: 'trainingsEdit',
       component: TrainingsEditView,
-      meta: { requiresAdmin: true }
+      meta: { requiresAdmin: true },
     },
     {
       path: '/admin/trainings/create',
       name: 'trainingsCreate',
       component: TrainingsCreateView,
-      meta: { requiresAdmin: true }
+      meta: { requiresAdmin: true },
     },
     {
       path: '/admin/user/trainings',
       name: 'userTrainingList',
       component: UserTrainingsListView,
-      meta: { requiresAdmin: true }
+      meta: { requiresAdmin: true },
     },
     {
       path: '/admin/trainings/questionmaker',
       name: 'trainingCreator',
-      component: TrainingCreationView
+      component: TrainingCreationView,
     },
   ],
 })

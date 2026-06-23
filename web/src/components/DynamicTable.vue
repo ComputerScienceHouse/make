@@ -1,43 +1,43 @@
 <script setup lang="ts" generic="T extends Record<string, any>">
-import { computed } from 'vue';
+import { computed } from 'vue'
 
 export interface TableOptions<T> {
   actions?: {
     edit?: {
-      path: (row: T) => string;
-    },
+      path: (row: T) => string
+    }
     delete?: {
-      handler: (row: T) => Promise<void>;
-    },
+      handler: (row: T) => Promise<void>
+    }
     checkbox?: boolean
-  };
+  }
 
   fields?: {
     [K in keyof T]?: {
-      label?: string;
-      hidden?: boolean;
-    };
-  };
+      label?: string
+      hidden?: boolean
+    }
+  }
 }
 
 interface Props<T> {
-  data: T[];
-  options: TableOptions<T>;
+  data: T[]
+  options: TableOptions<T>
 }
 
-const props = defineProps<Props<T>>();
+const props = defineProps<Props<T>>()
 
-const selectedRows = defineModel<T[]>({ default: [] });
+const selectedRows = defineModel<T[]>({ default: [] })
 function toggleRow(row: T, checked: boolean) {
   if (checked) {
     if (!selectedRows.value.includes(row)) {
-      selectedRows.value.push(row);
+      selectedRows.value.push(row)
     }
   } else {
-    const index = selectedRows.value.indexOf(row);
+    const index = selectedRows.value.indexOf(row)
 
     if (index !== -1) {
-      selectedRows.value.splice(index, 1);
+      selectedRows.value.splice(index, 1)
     }
   }
 }
@@ -46,17 +46,16 @@ const data = props.data
 const options = props.options
 
 const cols = computed(() => {
-  if (data?.length === 0 || !data) return [];
+  if (data?.length === 0 || !data) return []
 
   const keys = Object.keys(data[0]!) as (keyof T)[]
-  return keys.filter(col => !options.fields?.[col]?.hidden)
+  return keys.filter((col) => !options.fields?.[col]?.hidden)
 })
 
 async function deleteRow(row: T) {
-  await options.actions?.delete?.handler(row);
-  window.location.reload();
+  await options.actions?.delete?.handler(row)
+  window.location.reload()
 }
-
 </script>
 <template>
   <div class="table-responsive">
@@ -74,7 +73,7 @@ async function deleteRow(row: T) {
 
       <tbody>
         <tr v-for="(row, i) in data" :key="i">
-          <td v-for="col in cols" :key="col" class="text-truncate" style="max-width: 200px;">
+          <td v-for="col in cols" :key="col" class="text-truncate" style="max-width: 200px">
             {{ row[col] }}
           </td>
 
@@ -97,16 +96,17 @@ async function deleteRow(row: T) {
           </td>
 
           <td v-if="options.actions?.checkbox">
-            <input type="checkbox" :checked="selectedRows.includes(row)" class="form-check-input"
-              @change="toggleRow(row, ($event.target as HTMLInputElement).checked)" />
+            <input
+              type="checkbox"
+              :checked="selectedRows.includes(row)"
+              class="form-check-input"
+              @change="toggleRow(row, ($event.target as HTMLInputElement).checked)"
+            />
           </td>
         </tr>
-
       </tbody>
     </table>
 
-    <span v-if="cols.length === 0">
-      No recorded data
-    </span>
+    <span v-if="cols.length === 0"> No recorded data </span>
   </div>
 </template>

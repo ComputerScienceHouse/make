@@ -1,34 +1,31 @@
-import { reactive } from "vue";
+import { reactive } from 'vue'
 
 export interface UserInfo {
-    uuid: string;
-    email: string;
-    preferred_username: string;
-    name: string;
-    groups: string[];
+  uuid: string
+  email: string
+  preferred_username: string
+  name: string
+  groups: string[]
 }
 
 export const authState = reactive({
-    user: null as UserInfo | null,
-    isAdmin(): boolean {
-        return this.user?.groups?.includes("eboard") ?? false;
-    }
-});
+  user: null as UserInfo | null,
+  isAdmin(): boolean {
+    return this.user?.groups?.includes('eboard') ?? false
+  },
+})
 
 export async function loadUser() {
+  try {
+    const res = await fetch('/api/me', {
+      credentials: 'include',
+    })
 
-    try {
-        const res = await fetch("/api/me", {
-            credentials: "include",
-        });
-
-        if (!res.ok) {
-            authState.user = null;
-            return;
-        }
-
-        authState.user = await res.json();
-    } catch {
-
+    if (!res.ok) {
+      authState.user = null
+      return
     }
+
+    authState.user = await res.json()
+  } catch {}
 }

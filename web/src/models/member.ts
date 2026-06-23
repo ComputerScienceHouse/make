@@ -1,4 +1,4 @@
 export interface Member {
-    username: string,
-    uuid: string,
+  username: string
+  uuid: string
 }

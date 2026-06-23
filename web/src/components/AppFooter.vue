@@ -20,8 +20,11 @@ const year = new Date().getFullYear()
 
       <span class="text-muted">|</span>
 
-      <a href="https://github.com/ComputerScienceHouse/make" target="_blank"
-        class="text-decoration-none text-body-secondary">
+      <a
+        href="https://github.com/ComputerScienceHouse/make"
+        target="_blank"
+        class="text-decoration-none text-body-secondary"
+      >
         <i class="bi bi-github me-1"></i>
         Source
       </a>

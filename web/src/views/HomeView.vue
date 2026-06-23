@@ -1,37 +1,38 @@
 <script setup lang="ts">
-import { ref, onMounted } from "vue";
-import type { Area } from "@/models/areas";
-import { authState } from "@/auth";
-
+import { ref, onMounted } from 'vue'
+import type { Area } from '@/models/areas'
+import { authState } from '@/auth'
 
 const user = authState.user
-const areas = ref<Area[]>([]);
-const areasWithAccess = ref<number[]>([]);
+const areas = ref<Area[]>([])
+const areasWithAccess = ref<number[]>([])
 
 onMounted(async () => {
   const [areaRes, accessRes] = await Promise.all([
-    fetch("/api/areas"),
+    fetch('/api/areas'),
     fetch(`/api/user/${user?.uuid}/areaAccess`),
   ])
-  areas.value = await areaRes.json();
-  areasWithAccess.value = await accessRes.json();
-});
+  areas.value = await areaRes.json()
+  areasWithAccess.value = await accessRes.json()
+})
 </script>
 
 <template>
   <main class="container">
     <h1>Welcome to MAKE</h1>
 
-    <p>
-      The central hub for training and resources for CSH's special-use rooms.
-    </p>
+    <p>The central hub for training and resources for CSH's special-use rooms.</p>
     <h1>Profile</h1>
 
     <div class="card mb-4 shadow-sm">
       <div class="d-flex flex-row justify-content-between">
         <div class="card-body d-flex align-items-center gap-3">
-          <img :src="'https://profiles.csh.rit.edu/image/' + user?.preferred_username" class="rounded-circle"
-            height="100" width="100">
+          <img
+            :src="'https://profiles.csh.rit.edu/image/' + user?.preferred_username"
+            class="rounded-circle"
+            height="100"
+            width="100"
+          />
           <div>
             <h2 class="mb-0">{{ user?.name }}</h2>
             <span class="text-body-secondary">{{ user?.preferred_username }}</span>
@@ -43,9 +44,13 @@ onMounted(async () => {
             <h6 class="mb-2 text-body-secondary">Access Status:</h6>
             <ul class="list-unstyled mb-0">
               <li v-for="area in areas" :key="area.id" class="d-flex align-items-center gap-2">
-
                 <i
-                  :class="areasWithAccess.includes(area.id) ? 'bi bi-check-circle-fill text-success' : 'bi bi-x-circle-fill text-danger'"></i>
+                  :class="
+                    areasWithAccess.includes(area.id)
+                      ? 'bi bi-check-circle-fill text-success'
+                      : 'bi bi-x-circle-fill text-danger'
+                  "
+                ></i>
 
                 {{ area.name }}
               </li>
@@ -58,14 +63,11 @@ onMounted(async () => {
     <div class="d-flex justify-content-between align-items-center">
       <h1>Areas:</h1>
       <RouterLink v-if="authState.isAdmin()" to="/admin/areas/create" class="btn btn-primary">
-          <i class="bi-plus-lg"></i>
+        <i class="bi-plus-lg"></i>
       </RouterLink>
     </div>
 
-
     <div class="row g-4">
-
-
       <div v-for="area in areas" :key="area.id" class="col-12 col-md-6">
         <RouterLink class="no_underline" :to="'/areas/' + area.id">
           <div class="card h-100 border-1 shadow-none">

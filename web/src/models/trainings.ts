@@ -1,46 +1,46 @@
 type BaseQuestion = {
-  id: string;
-  label: string;
-  required?: boolean;
-};
+  id: string
+  label: string
+  required?: boolean
+}
 
 export type TextQuestion = BaseQuestion & {
-  type: "text";
-};
+  type: 'text'
+}
 
 export type BigTextQuestion = BaseQuestion & {
-  type: "textarea";
-};
+  type: 'textarea'
+}
 
 export type NumberQuestion = BaseQuestion & {
-  type: "number";
-};
+  type: 'number'
+}
 
 export type RadioQuestion = BaseQuestion & {
-  type: "radio";
-  options: string[];
-};
+  type: 'radio'
+  options: string[]
+}
 
 export type CheckboxQuestion = BaseQuestion & {
-  type: "checkbox";
-};
+  type: 'checkbox'
+}
 
 export type Question =
   | TextQuestion
   | BigTextQuestion
   | NumberQuestion
   | RadioQuestion
-  | CheckboxQuestion;
+  | CheckboxQuestion
 
 export interface Training {
-    id: number,
-    title: string,
-    description: string,
-    questions: Question[],
+  id: number
+  title: string
+  description: string
+  questions: Question[]
 }
 export interface UserTraining {
-  userUuid: string;
-  trainingId: number;
-  completedAt: Date;
-  expiresAt: Date;
+  userUuid: string
+  trainingId: number
+  completedAt: Date
+  expiresAt: Date
 }
