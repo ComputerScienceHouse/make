@@ -116,7 +116,7 @@ onMounted(async () => {
             <div class="mt-auto">
               <div class="progress" style="height: 6px">
                 <div
-                  class="progress-bar"
+                  class="progress-bar progress-bar-animated progress-bar-striped"
                   role="progressbar"
                   aria-valuenow="0"
                   aria-valuemin="0"
