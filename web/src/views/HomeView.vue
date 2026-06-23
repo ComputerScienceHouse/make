@@ -25,7 +25,7 @@ onMounted(async () => {
     <h1>Profile</h1>
 
     <div class="card mb-4 shadow-sm">
-      <div class="d-flex flex-row justify-content-between">
+      <div class="d-flex flex-column flex-sm-row justify-content-between">
         <div class="card-body d-flex align-items-center gap-3">
           <img
             :src="'https://profiles.csh.rit.edu/image/' + user?.preferred_username"
@@ -39,7 +39,7 @@ onMounted(async () => {
           </div>
         </div>
 
-        <div class="d-flex align-items-center pe-4">
+        <div class="d-flex align-items-center justify-content-center pb-3 pb-sm-0 text-center pe-4">
           <div>
             <h6 class="mb-2 text-body-secondary">Access Status:</h6>
             <ul class="list-unstyled mb-0">
