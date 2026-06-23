@@ -132,15 +132,24 @@ onMounted(async () => {
       <div class="col-lg-8">
         <div class="card h-100">
           <div class="card-body">
-            <h5 class="card-title mb-3">Required Training</h5>
+            <h5 class="card-title mb-3">Required Trainings</h5>
 
             <ul class="list-group list-group-flush">
+              <li
+                v-if="trainings?.length === 0"
+                class="list-group-item d-flex justify-content-between text-muted"
+              >
+                No trainings associated with area
+              </li>
               <li
                 v-for="training in trainings"
                 :key="training.id"
                 class="list-group-item d-flex justify-content-between"
               >
-                {{ training.title }}
+                <RouterLink :to="`/training/${training.id}`" class="training-link">
+                  {{ training.title }}
+                </RouterLink>
+
                 <span
                   v-if="userTrainings?.some((t) => t.trainingId === training.id)"
                   class="badge text-bg-success"
@@ -188,5 +197,15 @@ onMounted(async () => {
     rgba(0, 0, 0, 0.1) 70%,
     rgba(0, 0, 0, 0) 100%
   );
+}
+
+.training-link {
+  text-decoration: none;
+  color: var(--bs-dark);
+}
+
+.training-link:hover {
+  color: var(--bs-primary);
+  text-decoration: underline;
 }
 </style>
