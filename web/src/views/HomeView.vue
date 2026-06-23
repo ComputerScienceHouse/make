@@ -71,7 +71,12 @@ onMounted(async () => {
       <div v-for="area in areas" :key="area.id" class="col-12 col-md-6">
         <RouterLink class="no_underline" :to="'/areas/' + area.id">
           <div class="card h-100 border-1 shadow-none">
-            <img :src="area.photourl" class="card-img-top" height="150" :alt="area.name" />
+            <img
+              :src="area.photourl"
+              class="card-img-top object-fit-cover"
+              height="150"
+              :alt="area.name"
+            />
 
             <div class="card-body d-flex flex-column">
               <h4 class="card-title mb-2">
