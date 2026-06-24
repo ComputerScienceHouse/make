@@ -62,7 +62,7 @@ function addOptionToRadioQuestion(question: RadioQuestion) {
 }
 
 async function saveTraining(t: TrainingFull) {
-  const res = await fetch(`/api/trainings/create`, {
+  const res = await fetch(`/api/trainings/`, {
     method: 'POST',
     body: JSON.stringify(t),
     credentials: 'include',
