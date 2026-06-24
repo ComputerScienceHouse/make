@@ -128,37 +128,54 @@ func (database *DatabaseHelper) UpdateArea(area models.CreateAreaRequest, id int
 	return nil
 }
 
-func (database *DatabaseHelper) GetTraining(trainingID int, includeAnswers bool) (models.Training, error) {
-	query := `
+/*
+
+	qe := `
 	SELECT
-		t.id, t.title, t.description,
 		q.id, q.label, q.type, q.answer, q.required,
 		o.label
-	FROM trainings t
-	LEFT JOIN training_questions q ON q.training_id = t.id
+	FROM training_questions q
 	LEFT JOIN question_options o ON o.question_id = q.id
-	WHERE t.id = $1
+	WHERE q.training_id = $1
 	ORDER BY q.id, o.id
 	`
+*/
 
-	rows, err := database.DB.Query(query, trainingID)
+func (database *DatabaseHelper) GetTraining(trainingID int, includeAnswers bool) (models.Training, error) {
+	var training models.Training
+	training.Questions = []models.Question{}
+
+	var currentQuestion *models.Question
+	lastQuestionId := 0
+
+	query := "SELECT id, title, description FROM trainings WHERE id = $1"
+
+	row := database.DB.QueryRow(query, trainingID)
+
+	err := row.Scan(
+		&training.ID,
+		&training.Title,
+		&training.Description,
+	)
 	if err != nil {
 		return models.Training{}, err
 	}
 
-	var training models.Training
-	var currentQuestion *models.Question
-	lastQuestionId := 0
+	query = `SELECT
+                q.id, q.label, q.type, q.answer, q.required,
+                o.label
+        FROM training_questions q
+        LEFT JOIN question_options o ON o.question_id = q.id
+        WHERE q.training_id = $1
+        ORDER BY q.id, o.id;`
 
-	for rows.Next() {
+	qRows, err := database.DB.Query(query, training.ID)
+
+	for qRows.Next() {
 		var question models.Question
 		var option sql.NullString
 
-		err = rows.Scan(
-			&training.ID,
-			&training.Title,
-			&training.Description,
-
+		qRows.Scan(
 			&question.ID,
 			&question.Label,
 			&question.Type,
@@ -167,10 +184,6 @@ func (database *DatabaseHelper) GetTraining(trainingID int, includeAnswers bool)
 
 			&option,
 		)
-
-		if err != nil {
-			return models.Training{}, err
-		}
 
 		if lastQuestionId != question.ID { // new question
 			training.Questions = append(training.Questions, question)
