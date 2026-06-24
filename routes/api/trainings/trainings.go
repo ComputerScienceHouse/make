@@ -44,7 +44,36 @@ func getAllTrainings(c *gin.Context) {
 func getTraining(c *gin.Context) {
 	id, err := strconv.Atoi(c.Param("id"))
 
-	training, err := database.Helper.GetTraining(id)
+	training, err := database.Helper.GetTraining(id, false)
+
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			c.JSON(404, gin.H{"error": "training not found"})
+			return
+		}
+
+		c.Error(err)
+		return
+	}
+
+	c.JSON(200, training)
+}
+
+// GetTraining godoc
+//
+// @Summary Get training
+// @Description Returns a training by ID
+// @Tags trainings
+// @Produce json
+// @Param id path int true "Training ID"
+// @Success 200 {object} models.TrainingFull
+// @Failure 404 {object} models.ErrorResponse
+// @Failure 500 {object} models.ErrorResponse
+// @Router /trainings/{id}/full [get]
+func getTrainingFull(c *gin.Context) {
+	id, err := strconv.Atoi(c.Param("id"))
+
+	training, err := database.Helper.GetTraining(id, true)
 
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
@@ -252,6 +281,7 @@ func Routes(route *gin.RouterGroup) {
 	trainings := route.Group("/trainings")
 	trainings.GET("/", getAllTrainings)
 	trainings.GET("/:id", getTraining)
+	trainings.GET("/:id/full", middleware.RequireGroup("eboard"), getTrainingFull)
 	trainings.GET("/area/:id", getAreaTrainings)
 
 	trainings.PUT("/:id", middleware.RequireGroup("eboard"), updateTraining)

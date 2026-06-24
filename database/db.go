@@ -128,11 +128,11 @@ func (database *DatabaseHelper) UpdateArea(area models.CreateAreaRequest, id int
 	return nil
 }
 
-func (database *DatabaseHelper) GetTraining(trainingID int) (models.Training, error) {
+func (database *DatabaseHelper) GetTraining(trainingID int, includeAnswers bool) (models.Training, error) {
 	query := `
 	SELECT
 		t.id, t.title, t.description,
-		q.id, q.label, q.type, q.required,
+		q.id, q.label, q.type, q.answer, q.required,
 		o.label
 	FROM trainings t
 	LEFT JOIN training_questions q ON q.training_id = t.id
@@ -162,6 +162,7 @@ func (database *DatabaseHelper) GetTraining(trainingID int) (models.Training, er
 			&question.ID,
 			&question.Label,
 			&question.Type,
+			&question.Answer,
 			&question.Required,
 
 			&option,
@@ -175,6 +176,10 @@ func (database *DatabaseHelper) GetTraining(trainingID int) (models.Training, er
 			training.Questions = append(training.Questions, question)
 			currentQuestion = &training.Questions[len(training.Questions)-1]
 			lastQuestionId = question.ID
+
+			if !includeAnswers {
+				currentQuestion.Answer = nil
+			}
 		}
 
 		// radio type questions will have additional options
@@ -206,7 +211,7 @@ func (database *DatabaseHelper) GetAllTrainings() ([]models.Training, error) {
 			return []models.Training{}, err
 		}
 
-		training, err := database.GetTraining(trainingId)
+		training, err := database.GetTraining(trainingId, false)
 		if err != nil {
 			return []models.Training{}, err
 		}
@@ -311,7 +316,7 @@ func (database *DatabaseHelper) GetAreaTrainings(area int) ([]models.Training, e
 		}
 
 		// fetch this training, add to array
-		training, err := database.GetTraining(trainingID)
+		training, err := database.GetTraining(trainingID, false)
 		if err != nil {
 			return []models.Training{}, err
 		}

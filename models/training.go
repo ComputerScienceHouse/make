@@ -10,12 +10,9 @@ type Question struct {
 	Required bool     `json:"required,omitempty"`
 	Type     string   `json:"type"`
 	Options  []string `json:"options,omitempty"`
+	Answer   any      `json:"answer,omitempty"`
 }
 
-type QuestionWithAnswer struct {
-	Question
-	Answer any `json:"answer"`
-}
 type Training struct {
 	ID          int        `json:"id"`
 	Title       string     `json:"title"`
@@ -24,9 +21,9 @@ type Training struct {
 }
 
 type CreateTrainingRequest struct {
-	Title       string               `json:"title"`
-	Description string               `json:"description"`
-	Questions   []QuestionWithAnswer `json:"questions"`
+	Title       string     `json:"title"`
+	Description string     `json:"description"`
+	Questions   []Question `json:"questions"`
 }
 
 type UserTraining struct {
