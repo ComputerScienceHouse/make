@@ -88,8 +88,8 @@ function addOptionToRadioQuestion(question: RadioQuestion) {
 }
 
 async function saveTraining(t: TrainingFull) {
-  const res = await fetch(`/api/trainings/create`, {
-    method: 'POST',
+  const res = await fetch(`/api/trainings/${training.value.id}`, {
+    method: 'PUT',
     body: JSON.stringify(t),
     credentials: 'include',
   })
@@ -98,7 +98,7 @@ async function saveTraining(t: TrainingFull) {
     throw new Error(`Failed to save training: ${res.status}`)
   }
 
-  router.push({ path: `/admin/trainings/` })
+  location.reload();
 
   return
 }
