@@ -290,7 +290,14 @@ func (database *DatabaseHelper) CreateTraining(training models.CreateTrainingReq
 
 // TODO: make it actually update..
 func (database *DatabaseHelper) UpdateTraining(training models.CreateTrainingRequest, trainingId int) error {
-	_, err := database.DB.Exec(
+	tx, err := database.DB.Begin()
+	if err != nil {
+		return err
+	}
+
+	defer tx.Rollback()
+
+	_, err = tx.Exec(
 		"UPDATE trainings SET title = $1, description = $2 WHERE id = $3",
 		training.Title,
 		training.Description,
@@ -301,7 +308,47 @@ func (database *DatabaseHelper) UpdateTraining(training models.CreateTrainingReq
 		return err
 	}
 
-	return nil
+	_, err = tx.Exec(
+		"DELETE FROM training_questions WHERE training_id = $1",
+		trainingId,
+	)
+
+	if err != nil {
+		return err
+	}
+
+	for _, q := range training.Questions {
+		var questionId int
+		err = tx.QueryRow(
+			"INSERT INTO training_questions (training_id, label, type, answer, required) VALUES ($1, $2, $3, $4, $5) RETURNING id",
+			trainingId,
+			q.Label,
+			q.Type,
+			q.Answer,
+			q.Required,
+		).Scan(&questionId)
+
+		if err != nil {
+			return err
+		}
+
+		if q.Type == "radio" {
+			for _, option := range q.Options {
+				_, err = tx.Exec(
+					"INSERT INTO question_options (question_id, label) VALUES ($1, $2)",
+					questionId,
+					option,
+				)
+
+				if err != nil {
+					return err
+				}
+			}
+
+		}
+	}
+
+	return tx.Commit()
 }
 
 type dbAreaTraining struct {

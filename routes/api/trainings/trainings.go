@@ -98,7 +98,7 @@ func getTrainingFull(c *gin.Context) {
 // @Success 201
 // @Failure 400 {object} models.ErrorResponse
 // @Failure 500 {object} models.ErrorResponse
-// @Router /trainings/create [post]
+// @Router /trainings [post]
 func createTraining(c *gin.Context) {
 	var req models.CreateTrainingRequest
 
@@ -287,7 +287,7 @@ func Routes(route *gin.RouterGroup) {
 	trainings.PUT("/:id", middleware.RequireGroup("eboard"), updateTraining)
 
 	trainings.POST("/area/:id", middleware.RequireGroup("eboard"), addTrainingToArea)
-	trainings.POST("/create/", middleware.RequireGroup("eboard"), createTraining)
+	trainings.POST("/", middleware.RequireGroup("eboard"), createTraining)
 
 	trainings.DELETE("/area/:id", middleware.RequireGroup("eboard"), removeTrainingFromArea)
 	trainings.DELETE("/:id", middleware.RequireGroup("eboard"), deleteTraining)
