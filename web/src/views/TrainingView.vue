@@ -81,6 +81,10 @@ onMounted(async () => {
 
     <hr />
 
+    <p class="text-muted text-center mt-5" v-if="training.questions.length === 0">
+        This training has no questions.
+    </p>
+
     <form>
       <div v-for="q in training.questions" :key="q.id" class="mb-4 p-3 border rounded shadow-sm">
         <label :for="`${q.id}`" class="form-label fs-6">
@@ -123,9 +127,8 @@ onMounted(async () => {
         </div>
       </div>
 
-      <button class="btn btn-primary">Submit</button>
+      <button class="btn btn-primary" v-if="training.questions.length > 0">Submit</button>
     </form>
-    {{ answers }}
   </main>
 
   <main class="container py-4" v-else-if="notFound">
