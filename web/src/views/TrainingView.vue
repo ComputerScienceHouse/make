@@ -82,7 +82,7 @@ onMounted(async () => {
     <hr />
 
     <p class="text-muted text-center mt-5" v-if="training.questions.length === 0">
-        This training has no questions.
+      This training has no questions.
     </p>
 
     <form>
