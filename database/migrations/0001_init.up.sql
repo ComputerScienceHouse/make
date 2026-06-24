@@ -9,8 +9,7 @@ CREATE TABLE areas (
 CREATE TABLE trainings (
     id SERIAL PRIMARY KEY,
     title TEXT NOT NULL,
-    description TEXT,
-    questions JSONB NOT NULL
+    description TEXT
 );
 
 CREATE TABLE area_trainings (

@@ -129,76 +129,153 @@ func (database *DatabaseHelper) UpdateArea(area models.CreateAreaRequest, id int
 }
 
 func (database *DatabaseHelper) GetTraining(trainingID int) (models.Training, error) {
-	row := database.DB.QueryRow("SELECT id, title, description, questions FROM trainings WHERE id = $1", trainingID)
+	query := `
+	SELECT
+		t.id, t.title, t.description,
+		q.id, q.label, q.type, q.required,
+		o.label
+	FROM trainings t
+	LEFT JOIN training_questions q ON q.training_id = t.id
+	LEFT JOIN question_options o ON o.question_id = q.id
+	WHERE t.id = $1
+	ORDER BY q.id, o.id
+	`
 
-	var training models.Training
-
-	err := row.Scan(
-		&training.ID,
-		&training.Title,
-		&training.Description,
-		&training.Questions,
-	)
-
+	rows, err := database.DB.Query(query, trainingID)
 	if err != nil {
 		return models.Training{}, err
+	}
+
+	var training models.Training
+	var currentQuestion *models.Question
+	lastQuestionId := 0
+
+	for rows.Next() {
+		var question models.Question
+		var option sql.NullString
+
+		err = rows.Scan(
+			&training.ID,
+			&training.Title,
+			&training.Description,
+
+			&question.ID,
+			&question.Label,
+			&question.Type,
+			&question.Required,
+
+			&option,
+		)
+
+		if err != nil {
+			return models.Training{}, err
+		}
+
+		if lastQuestionId != question.ID { // new question
+			training.Questions = append(training.Questions, question)
+			currentQuestion = &training.Questions[len(training.Questions)-1]
+			lastQuestionId = question.ID
+		}
+
+		// radio type questions will have additional options
+		if question.Type == "radio" && option.Valid {
+			// is an option
+			currentQuestion.Options = append(currentQuestion.Options, option.String)
+		}
 	}
 
 	return training, nil
 }
 
 func (database *DatabaseHelper) GetAllTrainings() ([]models.Training, error) {
-	rows, err := database.DB.Query("SELECT id, title, description, questions FROM trainings")
+	rows, err := database.DB.Query("SELECT id FROM trainings")
 	if err != nil {
-		return []models.Training{}, nil
+		return []models.Training{}, err
 	}
 
 	var trainings []models.Training = []models.Training{}
 
 	for rows.Next() {
-		var training models.Training
+		var trainingId int
 
 		err := rows.Scan(
-			&training.ID,
-			&training.Title,
-			&training.Description,
-			&training.Questions,
+			&trainingId,
 		)
 
 		if err != nil {
-			return []models.Training{}, nil
+			return []models.Training{}, err
+		}
+
+		training, err := database.GetTraining(trainingId)
+		if err != nil {
+			return []models.Training{}, err
 		}
 
 		trainings = append(trainings, training)
-	}
-	if err != nil {
-		return []models.Training{}, err
 	}
 
 	return trainings, nil
 }
 
 func (database *DatabaseHelper) CreateTraining(training models.CreateTrainingRequest) error {
-	_, err := database.DB.Exec(
-		"INSERT INTO trainings (title, description, questions) VALUES ($1, $2, $3)",
+	tx, err := database.DB.Begin()
+	if err != nil {
+		return err
+	}
+
+	defer tx.Rollback()
+
+	var trainingId int
+	err = tx.QueryRow(
+		"INSERT INTO trainings (title, description) VALUES ($1, $2) RETURNING id",
 		training.Title,
 		training.Description,
-		training.Questions,
-	)
+	).Scan(&trainingId)
 
 	if err != nil {
 		return err
 	}
 
-	return nil
+	for _, q := range training.Questions {
+		var questionId int
+		err = tx.QueryRow(
+			"INSERT INTO training_questions (training_id, label, type, answer, required) VALUES ($1, $2, $3, $4, $5) RETURNING id",
+			trainingId,
+			q.Label,
+			q.Type,
+			q.Answer,
+			q.Required,
+		).Scan(&questionId)
+
+		if err != nil {
+			return err
+		}
+
+		if q.Type == "radio" {
+			for _, option := range q.Options {
+				_, err = tx.Exec(
+					"INSERT INTO question_options (question_id, label) VALUES ($1, $2)",
+					questionId,
+					option,
+				)
+
+				if err != nil {
+					return err
+				}
+			}
+
+		}
+	}
+
+	return tx.Commit()
 }
 
+// TODO: make it actually update..
 func (database *DatabaseHelper) UpdateTraining(training models.CreateTrainingRequest, trainingId int) error {
 	_, err := database.DB.Exec(
-		"UPDATE trainings SET title = $1, description = $2, questions = $3 WHERE id = $4",
+		"UPDATE trainings SET title = $1, description = $2 WHERE id = $3",
 		training.Title,
 		training.Description,
-		training.Questions,
 		trainingId,
 	)
 
@@ -386,3 +463,5 @@ func (database *DatabaseHelper) DeleteTraining(trainingID int) error {
 
 	return nil
 }
+
+// [ { "id": 1, "label": "test", "required": true, "type": "radio", "options": [ "test", "tes2", "test3" ], "answer": "test" }, { "id": 2, "label": "answer is 5", "required": true, "type": "number", "answer": 5 } ]
