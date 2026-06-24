@@ -101,8 +101,8 @@ In a new terminal, complete the following:
 
 ## LICENSE
 
-Copyright (C) 2026 Tyler Severino
-Developed for Computer Science House.
+Copyright (C) 2026 Tyler Severino  
+Developed for Computer Science House
 
 This project is licensed under the GNU Affero General Public License v3.0 or later (AGPL-3.0-or-later).
 See the `LICENSE` file for details.
