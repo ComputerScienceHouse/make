@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { Question, QuestionWithAnswer, RadioQuestion, TrainingFull } from '@/models/trainings'
+import type { QuestionWithAnswer, RadioQuestion, TrainingFull } from '@/models/trainings'
 import router from '@/router'
 import { onMounted, ref } from 'vue'
 import { useRoute } from 'vue-router'

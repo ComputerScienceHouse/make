@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { Question, QuestionWithAnswer, RadioQuestion, TrainingFull } from '@/models/trainings'
+import type { QuestionWithAnswer, RadioQuestion, TrainingFull } from '@/models/trainings'
 import router from '@/router'
 import { ref } from 'vue'
 
@@ -9,7 +9,6 @@ const training = ref<TrainingFull>({
   description: 'Gets to creating!',
   questions: [],
 })
-const answers = ref<Record<string, string | number | boolean>>({})
 
 function addQuestion() {
   const questions = training.value.questions
