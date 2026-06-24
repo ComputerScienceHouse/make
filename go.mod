@@ -3,7 +3,7 @@ module makedotcsh
 go 1.26.4
 
 require (
-	github.com/computersciencehouse/csh-auth/v2 v2.0.1
+	github.com/computersciencehouse/csh-auth/v2 v2.0.2
 	github.com/gin-contrib/cors v1.7.7
 	github.com/gin-contrib/gzip v1.2.6
 	github.com/gin-contrib/logger v1.2.7
@@ -12,7 +12,6 @@ require (
 	github.com/golang-migrate/migrate/v4 v4.19.1
 	github.com/joho/godotenv v1.5.1
 	github.com/lib/pq v1.10.9
-	github.com/mattn/go-sqlite3 v1.14.45
 	github.com/swaggo/files v1.0.1
 	github.com/swaggo/gin-swagger v1.6.1
 	github.com/swaggo/swag v1.16.6
@@ -45,7 +44,6 @@ require (
 	github.com/google/uuid v1.6.0 // indirect
 	github.com/josharian/intern v1.0.0 // indirect
 	github.com/json-iterator/go v1.1.12 // indirect
-	github.com/kballard/go-shellquote v0.0.0-20180428030007-95032a82bc51 // indirect
 	github.com/klauspost/cpuid/v2 v2.3.0 // indirect
 	github.com/leodido/go-urn v1.4.0 // indirect
 	github.com/mailru/easyjson v0.7.6 // indirect
@@ -56,7 +54,6 @@ require (
 	github.com/pelletier/go-toml/v2 v2.3.1 // indirect
 	github.com/quic-go/qpack v0.6.0 // indirect
 	github.com/quic-go/quic-go v0.59.0 // indirect
-	github.com/remyoudompheng/bigfft v0.0.0-20200410134404-eec4a21b6bb0 // indirect
 	github.com/rs/zerolog v1.34.0 // indirect
 	github.com/sirupsen/logrus v1.9.4 // indirect
 	github.com/twitchyliquid64/golang-asm v0.15.1 // indirect
@@ -73,16 +70,4 @@ require (
 	golang.org/x/tools v0.44.0 // indirect
 	google.golang.org/protobuf v1.36.11 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
-	lukechampine.com/uint128 v1.2.0 // indirect
-	modernc.org/cc/v3 v3.36.3 // indirect
-	modernc.org/ccgo/v3 v3.16.9 // indirect
-	modernc.org/libc v1.17.1 // indirect
-	modernc.org/mathutil v1.5.0 // indirect
-	modernc.org/memory v1.2.1 // indirect
-	modernc.org/opt v0.1.3 // indirect
-	modernc.org/sqlite v1.18.1 // indirect
-	modernc.org/strutil v1.1.3 // indirect
-	modernc.org/token v1.0.0 // indirect
 )
-
-replace github.com/computersciencehouse/csh-auth/v2 => ./csh-auth
