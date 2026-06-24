@@ -553,6 +553,47 @@ const docTemplate = `{
                     }
                 }
             }
+        },
+        "/trainings/{id}/full": {
+            "get": {
+                "description": "Returns a training by ID",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "trainings"
+                ],
+                "summary": "Get training",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Training ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.Training"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    }
+                }
+            }
         }
     },
     "definitions": {
@@ -633,7 +674,12 @@ const docTemplate = `{
                 "description": {
                     "type": "string"
                 },
-                "questions": {},
+                "questions": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.Question"
+                    }
+                },
                 "title": {
                     "type": "string"
                 }
@@ -647,6 +693,30 @@ const docTemplate = `{
                 }
             }
         },
+        "models.Question": {
+            "type": "object",
+            "properties": {
+                "answer": {},
+                "id": {
+                    "type": "integer"
+                },
+                "label": {
+                    "type": "string"
+                },
+                "options": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "required": {
+                    "type": "boolean"
+                },
+                "type": {
+                    "type": "string"
+                }
+            }
+        },
         "models.Training": {
             "type": "object",
             "properties": {
@@ -656,7 +726,12 @@ const docTemplate = `{
                 "id": {
                     "type": "integer"
                 },
-                "questions": {},
+                "questions": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.Question"
+                    }
+                },
                 "title": {
                     "type": "string"
                 }

@@ -66,7 +66,7 @@ func getTraining(c *gin.Context) {
 // @Tags trainings
 // @Produce json
 // @Param id path int true "Training ID"
-// @Success 200 {object} models.TrainingFull
+// @Success 200 {object} models.Training
 // @Failure 404 {object} models.ErrorResponse
 // @Failure 500 {object} models.ErrorResponse
 // @Router /trainings/{id}/full [get]

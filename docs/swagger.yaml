@@ -50,7 +50,10 @@ definitions:
     properties:
       description:
         type: string
-      questions: {}
+      questions:
+        items:
+          $ref: '#/definitions/models.Question'
+        type: array
       title:
         type: string
     type: object
@@ -59,13 +62,32 @@ definitions:
       error:
         type: string
     type: object
+  models.Question:
+    properties:
+      answer: {}
+      id:
+        type: integer
+      label:
+        type: string
+      options:
+        items:
+          type: string
+        type: array
+      required:
+        type: boolean
+      type:
+        type: string
+    type: object
   models.Training:
     properties:
       description:
         type: string
       id:
         type: integer
-      questions: {}
+      questions:
+        items:
+          $ref: '#/definitions/models.Question'
+        type: array
       title:
         type: string
     type: object
@@ -316,6 +338,33 @@ paths:
           schema:
             $ref: '#/definitions/models.ErrorResponse'
       summary: Update training
+      tags:
+      - trainings
+  /trainings/{id}/full:
+    get:
+      description: Returns a training by ID
+      parameters:
+      - description: Training ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Training'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: Get training
       tags:
       - trainings
   /trainings/area/{id}:
