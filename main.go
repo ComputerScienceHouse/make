@@ -108,6 +108,8 @@ func main() {
 	if os.Getenv("DEV") == "true" {
 		router.NoRoute(auth.CookieMiddleware(), createViteProxy())
 	} else {
+		gin.SetMode(gin.ReleaseMode)
+
 		router.StaticFS("/assets", http.FS(assetsFS))
 
 		router.NoRoute(auth.CookieMiddleware(), func(c *gin.Context) {
@@ -122,6 +124,6 @@ func main() {
 	// swag
 	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
-	log.Println("running")
+	log.Println("Started!")
 	log.Fatal(router.Run())
 }
