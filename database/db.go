@@ -28,6 +28,7 @@ func Init() {
 	pass := os.Getenv("MAKE_DB_PASS")
 	dbOptions := fmt.Sprintf("postgres://%s:%s@%s/%s", url.QueryEscape(user), url.QueryEscape(pass), host, url.PathEscape(name))
 
+	log.Println("[DB] Connecting to database...")
 	DB, err := sql.Open("postgres", dbOptions)
 	if err != nil {
 		log.Fatal(err)
@@ -128,19 +129,6 @@ func (database *DatabaseHelper) UpdateArea(area models.CreateAreaRequest, id int
 	return nil
 }
 
-/*
-
-	qe := `
-	SELECT
-		q.id, q.label, q.type, q.answer, q.required,
-		o.label
-	FROM training_questions q
-	LEFT JOIN question_options o ON o.question_id = q.id
-	WHERE q.training_id = $1
-	ORDER BY q.id, o.id
-	`
-*/
-
 func (database *DatabaseHelper) GetTraining(trainingID int, includeAnswers bool) (models.Training, error) {
 	var training models.Training
 	training.Questions = []models.Question{}
@@ -148,13 +136,14 @@ func (database *DatabaseHelper) GetTraining(trainingID int, includeAnswers bool)
 	var currentQuestion *models.Question
 	lastQuestionId := 0
 
-	query := "SELECT id, title, description FROM trainings WHERE id = $1"
+	query := "SELECT id, title, required_correct, description FROM trainings WHERE id = $1"
 
 	row := database.DB.QueryRow(query, trainingID)
 
 	err := row.Scan(
 		&training.ID,
 		&training.Title,
+		&training.RequiredCorrect,
 		&training.Description,
 	)
 	if err != nil {
@@ -245,8 +234,9 @@ func (database *DatabaseHelper) CreateTraining(training models.CreateTrainingReq
 
 	var trainingId int
 	err = tx.QueryRow(
-		"INSERT INTO trainings (title, description) VALUES ($1, $2) RETURNING id",
+		"INSERT INTO trainings (title, required_correct, description) VALUES ($1, $2, $3) RETURNING id",
 		training.Title,
+		training.RequiredCorrect,
 		training.Description,
 	).Scan(&trainingId)
 
@@ -298,8 +288,9 @@ func (database *DatabaseHelper) UpdateTraining(training models.CreateTrainingReq
 	defer tx.Rollback()
 
 	_, err = tx.Exec(
-		"UPDATE trainings SET title = $1, description = $2 WHERE id = $3",
+		"UPDATE trainings SET title = $1, required_correct = $2, description = $3 WHERE id = $4",
 		training.Title,
+		training.RequiredCorrect,
 		training.Description,
 		trainingId,
 	)
@@ -529,4 +520,28 @@ func (database *DatabaseHelper) DeleteTraining(trainingID int) error {
 	return nil
 }
 
-// [ { "id": 1, "label": "test", "required": true, "type": "radio", "options": [ "test", "tes2", "test3" ], "answer": "test" }, { "id": 2, "label": "answer is 5", "required": true, "type": "number", "answer": 5 } ]
+func (database *DatabaseHelper) GetTrainingAnswers(trainingID int) (map[int]string, error) {
+	rows, err := database.DB.Query("SELECT id, answer FROM training_questions WHERE training_id = $1", trainingID)
+	if err != nil {
+		return map[int]string{}, err
+	}
+
+	var answers map[int]string = map[int]string{}
+
+	for rows.Next() {
+		var id int
+		var answer string
+
+		err = rows.Scan(
+			&id,
+			&answer,
+		)
+		if err != nil {
+			return map[int]string{}, err
+		}
+
+		answers[id] = answer
+	}
+
+	return answers, nil
+}
