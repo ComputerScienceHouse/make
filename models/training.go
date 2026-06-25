@@ -14,16 +14,18 @@ type Question struct {
 }
 
 type Training struct {
-	ID          int        `json:"id"`
-	Title       string     `json:"title"`
-	Description string     `json:"description"`
-	Questions   []Question `json:"questions"`
+	ID              int        `json:"id"`
+	Title           string     `json:"title"`
+	Description     string     `json:"description"`
+	RequiredCorrect int        `json:"requiredCorrect"`
+	Questions       []Question `json:"questions"`
 }
 
 type CreateTrainingRequest struct {
-	Title       string     `json:"title"`
-	Description string     `json:"description"`
-	Questions   []Question `json:"questions"`
+	Title           string     `json:"title"`
+	Description     string     `json:"description"`
+	RequiredCorrect int        `json:"requiredCorrect"`
+	Questions       []Question `json:"questions"`
 }
 
 type UserTraining struct {
@@ -31,4 +33,13 @@ type UserTraining struct {
 	TrainingID  int       `json:"trainingId"`
 	CompletedAt time.Time `json:"completedAt"`
 	ExpiresAt   time.Time `json:"expiresAt"`
+}
+
+type Submission = map[int]string
+
+type SubmissionResponse struct {
+	Passed       bool `json:"passed"`
+	NumCorrect   int  `json:"numCorrect"`
+	NumIncorrect int  `json:"numIncorrect"`
+	Grade        int  `json:"grade"`
 }

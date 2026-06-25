@@ -9,7 +9,8 @@ CREATE TABLE areas (
 CREATE TABLE trainings (
     id SERIAL PRIMARY KEY,
     title TEXT NOT NULL,
-    description TEXT
+    description TEXT,
+    required_correct INTEGER NOT NULL CHECK (required_correct >= 0)
 );
 
 CREATE TABLE area_trainings (

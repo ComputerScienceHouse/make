@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import type { QuestionWithAnswer, RadioQuestion, TrainingFull } from '@/models/trainings'
-import router from '@/router'
 import { onMounted, ref } from 'vue'
 import { useRoute } from 'vue-router'
 
@@ -10,6 +9,7 @@ const training = ref<TrainingFull>({
   id: 0,
   title: 'New Training',
   description: 'Gets to creating!',
+  requiredCorrect: 0,
   questions: [],
 })
 const route = useRoute()
@@ -112,11 +112,24 @@ async function saveTraining(t: TrainingFull) {
   <main class="container py-4" v-else-if="training">
     <div class="d-flex align-items-center justify-content-between">
       <div class="flex-grow-1 me-3">
-        <input type="text" v-model="training.title" class="h1 underline-input" />
+        <input type="text" v-model="training.title" class="h1 underline-input w-100" />
         <input type="text" v-model="training.description" class="p underline-input text-muted" />
+        <div class="mt-2">
+          <label class="form-label small">Required Correct Answers</label>
+          <input
+            type="number"
+            min="0"
+            :max="training.questions.length"
+            v-model.number="training.requiredCorrect"
+            class="form-control"
+            style="max-width: 100px;"
+          />
+        </div>
       </div>
       <div class="text-end flex-shrink-0">
-        <button class="btn btn-primary" @click="saveTraining(training)">Update</button>
+        <button class="btn btn-primary" @click="saveTraining(training)">
+          Update
+        </button>
       </div>
     </div>
 

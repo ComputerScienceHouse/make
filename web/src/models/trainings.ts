@@ -43,6 +43,7 @@ export interface Training {
   id: number
   title: string
   description: string
+  requiredCorrect: number
   questions: Question[]
 }
 
@@ -50,6 +51,7 @@ export interface TrainingFull {
   id: number
   title: string
   description: string
+  requiredCorrect: number
   questions: QuestionWithAnswer[]
 }
 
@@ -58,4 +60,11 @@ export interface UserTraining {
   trainingId: number
   completedAt: Date
   expiresAt: Date
+}
+
+export interface SubmissionResults {
+  passed: boolean
+  numCorrect: number
+  numIncorrect: number
+  grade: number
 }
