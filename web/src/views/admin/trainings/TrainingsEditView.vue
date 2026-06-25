@@ -98,7 +98,7 @@ async function saveTraining(t: TrainingFull) {
     throw new Error(`Failed to save training: ${res.status}`)
   }
 
-  location.reload();
+  location.reload()
 
   return
 }
@@ -122,14 +122,12 @@ async function saveTraining(t: TrainingFull) {
             :max="training.questions.length"
             v-model.number="training.requiredCorrect"
             class="form-control"
-            style="max-width: 100px;"
+            style="max-width: 100px"
           />
         </div>
       </div>
       <div class="text-end flex-shrink-0">
-        <button class="btn btn-primary" @click="saveTraining(training)">
-          Update
-        </button>
+        <button class="btn btn-primary" @click="saveTraining(training)">Update</button>
       </div>
     </div>
 

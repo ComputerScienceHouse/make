@@ -4,21 +4,16 @@
 
     <div class="content text-center z-1">
       <h1 class="fw-bold">Nothing here</h1>
-      <p class="text-break text-muted">
-        Nothing here go away
-      </p>
+      <p class="text-break text-muted">Nothing here go away</p>
 
-      <RouterLink to="/" class="btn btn-primary">
-        Return Home
-      </RouterLink>
+      <RouterLink to="/" class="btn btn-primary"> Return Home </RouterLink>
     </div>
   </main>
 </template>
 
 <style scoped>
-
 main {
-    margin-top: 5rem;
+  margin-top: 5rem;
 }
 
 .bg-text {
