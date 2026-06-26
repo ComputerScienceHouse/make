@@ -1,9 +1,9 @@
 <script setup lang="ts" generic="T extends Record<string, any>">
-import type { QuestionWithAnswer, RadioQuestion, TrainingFull } from '@/models/trainings';
+import type { QuestionWithAnswer, RadioQuestion, TrainingFull } from '@/models/trainings'
 import { ref } from 'vue'
 
 const props = defineProps<{
-    training: TrainingFull,
+  training: TrainingFull
 }>()
 const training = ref(props.training)
 
@@ -61,98 +61,100 @@ function addQuestion() {
 }
 </script>
 <template>
-    <form @submit.prevent>
-      <div
-        v-for="(q, i) in training.questions"
-        :key="q.id"
-        class="mb-4 p-3 border rounded shadow-sm d-flex justify-content-between"
-      >
-        <div>
-          <label :for="`${q.id}`" class="form-label fs-6">
-            <input type="text" v-model="q.label" class="underline-input" />
-            <span v-if="q.required" class="text-danger">*</span>
-          </label>
+  <form @submit.prevent>
+    <div
+      v-for="(q, i) in training.questions"
+      :key="q.id"
+      class="mb-4 p-3 border rounded shadow-sm d-flex justify-content-between"
+    >
+      <div>
+        <label :for="`${q.id}`" class="form-label fs-6">
+          <input type="text" v-model="q.label" class="underline-input" />
+          <span v-if="q.required" class="text-danger">*</span>
+        </label>
 
-          <textarea
-            v-if="q.type === 'textarea'"
-            :id="`${q.id}`"
-            v-model="q.answer"
-            class="form-control"
-          ></textarea>
+        <textarea
+          v-if="q.type === 'textarea'"
+          :id="`${q.id}`"
+          v-model="q.answer"
+          class="form-control"
+        ></textarea>
 
-          <input
-            v-else-if="q.type === 'number'"
-            :id="`${q.id}`"
-            v-model.number="q.answer"
-            type="number"
-            class="form-control"
-            :required="q.required"
-          />
+        <input
+          v-else-if="q.type === 'number'"
+          :id="`${q.id}`"
+          v-model.number="q.answer"
+          type="number"
+          class="form-control"
+          :required="q.required"
+        />
 
-          <div v-else-if="q.type == 'radio'">
-            <div v-for="(option, i) in q.options" :key="i" class="form-check">
-              <input
-                type="radio"
-                :id="option"
-                :value="option"
-                :name="`${q.id}`"
-                v-model="q.answer"
-                class="form-check-input pretty-radio"
-              />
+        <div v-else-if="q.type == 'radio'">
+          <div v-for="(option, i) in q.options" :key="i" class="form-check">
+            <input
+              type="radio"
+              :id="option"
+              :value="option"
+              :name="`${q.id}`"
+              v-model="q.answer"
+              class="form-check-input pretty-radio"
+            />
 
-              <label :for="option" class="form-check-label">
-                <input type="text" v-model="q.options[i]" class="underline-input" />
-              </label>
-            </div>
-
-            <button class="btn btn-bg p-0 m-0 mt-3" @click="addOptionToRadioQuestion(q)">
-              <i class="bi bi-plus-lg"></i>
-              Add Option
-            </button>
+            <label :for="option" class="form-check-label">
+              <input type="text" v-model="q.options[i]" class="underline-input" />
+            </label>
           </div>
 
-          <div v-else-if="q.type === 'checkbox'" class="form-check">
-            <input :id="`${q.id}`" v-model="q.answer" type="checkbox" class="form-check-input" />
-          </div>
+          <button class="btn btn-bg p-0 m-0 mt-3" @click="addOptionToRadioQuestion(q)">
+            <i class="bi bi-plus-lg"></i>
+            Add Option
+          </button>
         </div>
 
-        <!-- Right side -->
-        <div>
-          <label for="questionType">Question Type</label>
-          <select
-            class="form-select"
-            id="questionType"
-            v-model="q.type"
-            @change="training.questions[i] = changeQuestionToDifferentType(q, q.type)"
-            aria-label="Default select example"
-          >
-            <option value="radio">Multiple Choice</option>
-            <option value="textarea">Text</option>
-            <option value="number">Number</option>
-          </select>
-
-          <div class="form-check mt-2">
-            <input type="checkbox" id="required" class="form-check-input" v-model="q.required" />
-            <label for="required" class="form-check-label">Required?</label>
-          </div>
-
-          <div class="mt-2 text-end">
-            <button id="deleteButton" class="btn btn-danger" @click="deleteQuestion(i)">
-              <i class="bi bi-trash"></i>
-            </button>
-          </div>
+        <div v-else-if="q.type === 'checkbox'" class="form-check">
+          <input :id="`${q.id}`" v-model="q.answer" type="checkbox" class="form-check-input" />
         </div>
       </div>
 
-      <div class="text-center text-muted mt-5 mb-5" v-if="training.questions.length === 0">No questions</div>
+      <!-- Right side -->
+      <div>
+        <label for="questionType">Question Type</label>
+        <select
+          class="form-select"
+          id="questionType"
+          v-model="q.type"
+          @change="training.questions[i] = changeQuestionToDifferentType(q, q.type)"
+          aria-label="Default select example"
+        >
+          <option value="radio">Multiple Choice</option>
+          <option value="textarea">Text</option>
+          <option value="number">Number</option>
+        </select>
 
-      <div class="text-center mt-3">
-        <button class="btn btn-primary" @click="addQuestion">
-          <i class="bi bi-plus-lg"></i>
-          Add Question
-        </button>
+        <div class="form-check mt-2">
+          <input type="checkbox" id="required" class="form-check-input" v-model="q.required" />
+          <label for="required" class="form-check-label">Required?</label>
+        </div>
+
+        <div class="mt-2 text-end">
+          <button id="deleteButton" class="btn btn-danger" @click="deleteQuestion(i)">
+            <i class="bi bi-trash"></i>
+          </button>
+        </div>
       </div>
-    </form>
+    </div>
+
+    <div class="text-center text-muted mt-5 mb-5" v-if="training.questions.length === 0">
+      No questions
+    </div>
+
+    <div class="text-center mt-3">
+      <button class="btn btn-primary" @click="addQuestion">
+        <i class="bi bi-plus-lg"></i>
+        Add Question
+      </button>
+    </div>
+  </form>
 </template>
 
 <style>

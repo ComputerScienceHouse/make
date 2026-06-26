@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import TrainingEditForm from '@/components/TrainingEditForm.vue'
-import type { QuestionWithAnswer, RadioQuestion, TrainingFull } from '@/models/trainings'
+import type { TrainingFull } from '@/models/trainings'
 import { onMounted, ref } from 'vue'
 import { useRoute } from 'vue-router'
 

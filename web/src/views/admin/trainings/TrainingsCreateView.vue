@@ -43,6 +43,6 @@ async function saveTraining(t: TrainingFull) {
 
     <hr />
 
-   <TrainingEditForm :training="training"></TrainingEditForm>
+    <TrainingEditForm :training="training"></TrainingEditForm>
   </main>
 </template>
