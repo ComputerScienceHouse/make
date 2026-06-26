@@ -18,7 +18,6 @@ FROM golang:1.26 as build
 WORKDIR /make/
 
 COPY --from=web /app/dist /make/web/dist
-COPY csh-auth/ ./csh-auth/
 COPY go.mod go.sum ./
 
 RUN go mod download
