@@ -278,7 +278,6 @@ func (database *DatabaseHelper) CreateTraining(training models.CreateTrainingReq
 	return tx.Commit()
 }
 
-// TODO: make it actually update..
 func (database *DatabaseHelper) UpdateTraining(training models.CreateTrainingRequest, trainingId int) error {
 	tx, err := database.DB.Begin()
 	if err != nil {
@@ -438,6 +437,8 @@ func (database *DatabaseHelper) GetUserTraining(trainingID int) (models.UserTrai
 		return models.UserTraining{}, err
 	}
 
+	// check training validity while pulling
+
 	return training, nil
 }
 
@@ -483,8 +484,18 @@ func (database *DatabaseHelper) RemoveTrainingFromArea(areaID int, trainingID in
 }
 
 func (database *DatabaseHelper) GetAllAreasWithUserAccess(uuid string) ([]int, error) {
-	// insane query god bless sql (this was 100 lines of logic beforehand)
-	query := "SELECT a.id FROM areas a JOIN area_trainings at ON at.area_id = a.id LEFT JOIN user_trainings ut ON ut.training_id = at.training_id AND ut.user_uuid = $1 GROUP BY a.id, a.name HAVING COUNT(DISTINCT at.training_id) = COUNT(DISTINCT ut.training_id)"
+	query := `
+		SELECT a.id
+		FROM areas a
+		JOIN area_trainings at ON at.area_id = a.id
+		LEFT JOIN user_trainings ut
+		ON ut.training_id = at.training_id
+		AND ut.user_uuid = 'fbdf472c-8c4b-11f0-ad1f-62123a302540'
+		AND (ut.expires_at IS NULL OR ut.expires_at > NOW())
+		GROUP BY a.id, a.name
+		HAVING COUNT(DISTINCT at.training_id)
+			= COUNT(DISTINCT ut.training_id);
+	`
 	rows, err := database.DB.Query(query, uuid)
 	if err != nil {
 		return []int{}, err
