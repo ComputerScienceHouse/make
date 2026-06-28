@@ -5,6 +5,7 @@ WORKDIR /app
 
 RUN apk add --no-cache git
 COPY web/package*.json ./
+COPY .git .
 
 RUN npm ci
 
