@@ -15,7 +15,7 @@ const year = new Date().getFullYear()
 
       <span>
         <i class="bi bi-git me-1"></i>
-        {{ version }} β
+        {{ version }} α
       </span>
 
       <span class="text-muted">|</span>
