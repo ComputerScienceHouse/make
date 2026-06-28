@@ -48,6 +48,7 @@ onMounted(async () => {
     trainings.value = await trainingRes.json()
   } catch (err) {
     console.error(err)
+    error.value = `Error while fetching trainings`
   } finally {
     loading.value = false
   }

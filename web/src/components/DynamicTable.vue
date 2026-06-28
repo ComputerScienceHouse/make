@@ -1,5 +1,5 @@
 <script setup lang="ts" generic="T extends Record<string, any>">
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 
 export interface TableOptions<T> {
   actions?: {
@@ -45,6 +45,8 @@ function toggleRow(row: T, checked: boolean) {
 const data = props.data
 const options = props.options
 
+const error = ref<string>()
+
 const cols = computed(() => {
   if (data?.length === 0 || !data) return []
 
@@ -52,9 +54,18 @@ const cols = computed(() => {
   return keys.filter((col) => !options.fields?.[col]?.hidden)
 })
 
-async function deleteRow(row: T) {
-  await options.actions?.delete?.handler(row)
-  window.location.reload()
+async function deleteRow(row: T) { 
+  try {
+    await options.actions?.delete?.handler(row)
+
+    const idx = data.indexOf(row)
+    if(idx !== -1) {
+     data.splice(idx, 1); 
+    }
+  } catch (err) {
+    error.value = "Error while deleting row"
+    console.error(err)
+  }
 }
 </script>
 <template>
@@ -108,5 +119,6 @@ async function deleteRow(row: T) {
     </table>
 
     <span v-if="cols.length === 0"> No recorded data </span>
+    <p v-if="error" class="text-danger">{{ error }}</p>
   </div>
 </template>

@@ -7,6 +7,7 @@ import type { UserTraining } from '@/models/trainings'
 import type { Member } from '@/models/member'
 
 import { ref, onMounted } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 
 const members = ref<Member[]>([])
 const selectedMember = ref<Member>()
@@ -15,8 +16,10 @@ const memberSearch = ref('')
 const trainings = ref<UserTraining[]>([])
 const loading = ref(true)
 const trainingsLoading = ref(false)
-
 const showTrainingModal = ref(false)
+
+const route = useRoute()
+const router = useRouter()
 
 const tableOptions: TableOptions<UserTraining> = {
   actions: {
@@ -55,6 +58,8 @@ async function loadTrainings() {
 
   selectedMember.value = member
 
+  router.push({ query: { user: member.username }})
+
   try {
     trainingsLoading.value = true
 
@@ -87,6 +92,12 @@ onMounted(async () => {
     }
 
     members.value = await membersRes.json()
+
+    const username = route.query.user
+    if (typeof username === "string") {
+      memberSearch.value = username
+      loadTrainings()
+    }
   } catch (err) {
     console.error(err)
   } finally {
