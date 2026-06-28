@@ -490,7 +490,7 @@ func (database *DatabaseHelper) GetAllAreasWithUserAccess(uuid string) ([]int, e
 		JOIN area_trainings at ON at.area_id = a.id
 		LEFT JOIN user_trainings ut
 		ON ut.training_id = at.training_id
-		AND ut.user_uuid = 'fbdf472c-8c4b-11f0-ad1f-62123a302540'
+		AND ut.user_uuid = $1
 		AND (ut.expires_at IS NULL OR ut.expires_at > NOW())
 		GROUP BY a.id, a.name
 		HAVING COUNT(DISTINCT at.training_id)
