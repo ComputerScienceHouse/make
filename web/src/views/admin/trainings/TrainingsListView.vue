@@ -3,6 +3,7 @@ import DynamicTable from '@/components/DynamicTable.vue'
 import type { TableOptions } from '@/components/DynamicTable.vue'
 import { ref, onMounted } from 'vue'
 import type { Training } from '@/models/trainings'
+import LoadingScreen from '@/components/LoadingScreen.vue'
 
 const trainings = ref<Training[]>([])
 const loading = ref(true)
@@ -44,8 +45,9 @@ onMounted(async () => {
 
 <template>
   <main class="container py-4" v-if="loading">
-    <h1>Loading...</h1>
+    <LoadingScreen></LoadingScreen>
   </main>
+
 
   <main class="container" v-else>
     <div class="d-flex justify-content-between align-items-center">

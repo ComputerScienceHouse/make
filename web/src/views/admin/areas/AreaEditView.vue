@@ -8,6 +8,7 @@ import type { Training } from '@/models/trainings'
 import DynamicTable from '@/components/DynamicTable.vue'
 import type { TableOptions } from '@/components/DynamicTable.vue'
 import AddTrainingPopup from '@/components/AddTrainingPopup.vue'
+import LoadingScreen from '@/components/LoadingScreen.vue'
 
 const area = ref<Area>()
 const trainings = ref<Training[]>()
@@ -92,8 +93,9 @@ async function saveArea(area: Area) {
   </AddTrainingPopup>
 
   <main class="container py-4" v-if="loading">
-    <h1>Loading...</h1>
+    <LoadingScreen></LoadingScreen>
   </main>
+
 
   <main class="container" v-else-if="area && trainings">
     <div class="d-flex justify-content-between align-items-center">

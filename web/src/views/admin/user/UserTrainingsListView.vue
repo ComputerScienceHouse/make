@@ -8,6 +8,7 @@ import type { Member } from '@/models/member'
 
 import { ref, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import LoadingScreen from '@/components/LoadingScreen.vue'
 
 const members = ref<Member[]>([])
 const selectedMember = ref<Member>()
@@ -114,8 +115,9 @@ onMounted(async () => {
   />
 
   <main class="container py-4" v-if="loading">
-    <h1>Loading...</h1>
+    <LoadingScreen></LoadingScreen>
   </main>
+
 
   <main class="container" v-else>
     <h1 class="mb-4">Editing User Trainings</h1>

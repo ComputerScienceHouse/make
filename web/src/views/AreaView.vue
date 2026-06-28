@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { authState } from '@/auth'
+import LoadingScreen from '@/components/LoadingScreen.vue'
 import type { Area } from '@/models/areas'
 import type { Training, UserTraining } from '@/models/trainings'
 import { ref, onMounted, computed } from 'vue'
@@ -61,8 +62,9 @@ onMounted(async () => {
 
 <template>
   <main class="container py-4" v-if="loading">
-    <h1>Loading...</h1>
+    <LoadingScreen></LoadingScreen>
   </main>
+
 
   <main class="container py-4" v-else-if="area">
     <div class="position-relative rounded overflow-hidden mb-4" style="height: 280px">

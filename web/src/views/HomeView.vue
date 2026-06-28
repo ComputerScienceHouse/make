@@ -7,13 +7,27 @@ const user = authState.user
 const areas = ref<Area[]>([])
 const areasWithAccess = ref<number[]>([])
 
+const error = ref('')
+const loading = ref(true)
+
 onMounted(async () => {
-  const [areaRes, accessRes] = await Promise.all([
-    fetch('/api/areas'),
-    fetch(`/api/user/${user?.uuid}/areaAccess`),
-  ])
+  try {
+    loading.value = true
+
+    const [areaRes, accessRes] = await Promise.all([
+      fetch('/api/areas'),
+      fetch(`/api/user/${user?.uuid}/areaAccess`),
+    ])
   areas.value = await areaRes.json()
   areasWithAccess.value = await accessRes.json()
+
+  } catch (err) {
+    error.value = 'Error while fetching areas'
+    console.error(err)
+  } finally {
+    loading.value = false
+  }
+
 })
 </script>
 
@@ -91,9 +105,19 @@ onMounted(async () => {
         </RouterLink>
       </div>
 
-      <div v-if="areas.length === 0">
+      <div v-if="loading">
+        <LoadingScreen></LoadingScreen>
+      </div>
+      
+      <div v-if="error" class="text-danger">
+        Error while loading areas
+      </div>
+
+      <div v-if="areas.length === 0 && !loading">
         No areas found, add some!!nh nb ,mnbm,nbmbm,nbmbvnmbvn nmhjytrftrf
       </div>
+
+
     </div>
   </main>
 </template>

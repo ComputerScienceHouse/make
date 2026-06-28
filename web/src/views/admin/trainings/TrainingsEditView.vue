@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import LoadingScreen from '@/components/LoadingScreen.vue'
 import TrainingEditForm from '@/components/TrainingEditForm.vue'
 import type { TrainingFull } from '@/models/trainings'
 import { onMounted, ref } from 'vue'
@@ -56,8 +57,9 @@ async function saveTraining(t: TrainingFull) {
 
 <template>
   <main class="container py-4" v-if="loading">
-    <h1>Loading...</h1>
+    <LoadingScreen></LoadingScreen>
   </main>
+
 
   <main class="container py-4" v-else-if="training">
     <div class="d-flex align-items-center justify-content-between">

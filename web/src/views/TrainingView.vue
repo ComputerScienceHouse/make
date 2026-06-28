@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { authState } from '@/auth'
+import LoadingScreen from '@/components/LoadingScreen.vue'
 import type { SubmissionResults, Training, UserTraining } from '@/models/trainings'
 import { ref, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
@@ -49,6 +50,7 @@ onMounted(async () => {
 
 async function submitTraining() {
   const payload: Record<string, string> = {}
+  loading.value = true
 
   for (const [key, value] of Object.entries(answers.value)) {
     payload[key] = String(value)
@@ -65,13 +67,14 @@ async function submitTraining() {
   }
 
   submitted.value = true
+  loading.value = false
   submissionResults.value = await res.json()
 }
 </script>
 
 <template>
   <main class="container py-4" v-if="loading">
-    <h1>Loading...</h1>
+    <LoadingScreen></LoadingScreen>
   </main>
 
   <main class="container py-5" v-else-if="completedTraining !== -1">

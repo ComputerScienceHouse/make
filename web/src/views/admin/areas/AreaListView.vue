@@ -3,6 +3,7 @@ import DynamicTable from '@/components/DynamicTable.vue'
 import type { Area } from '@/models/areas'
 import type { TableOptions } from '@/components/DynamicTable.vue'
 import { ref, onMounted } from 'vue'
+import LoadingScreen from '@/components/LoadingScreen.vue'
 
 const areas = ref<Area[]>([])
 const loading = ref(true)
@@ -43,8 +44,9 @@ onMounted(async () => {
 
 <template>
   <main class="container py-4" v-if="loading">
-    <h1>Loading...</h1>
+    <LoadingScreen></LoadingScreen>
   </main>
+
 
   <main class="container" v-else>
     <div class="d-flex justify-content-between align-items-center">
