@@ -18,16 +18,14 @@ onMounted(async () => {
       fetch('/api/areas'),
       fetch(`/api/user/${user?.uuid}/areaAccess`),
     ])
-  areas.value = await areaRes.json()
-  areasWithAccess.value = await accessRes.json()
-
+    areas.value = await areaRes.json()
+    areasWithAccess.value = await accessRes.json()
   } catch (err) {
     error.value = 'Error while fetching areas'
     console.error(err)
   } finally {
     loading.value = false
   }
-
 })
 </script>
 
@@ -108,16 +106,12 @@ onMounted(async () => {
       <div v-if="loading">
         <LoadingScreen></LoadingScreen>
       </div>
-      
-      <div v-if="error" class="text-danger">
-        Error while loading areas
-      </div>
+
+      <div v-if="error" class="text-danger">Error while loading areas</div>
 
       <div v-if="areas.length === 0 && !loading">
         No areas found, add some!!nh nb ,mnbm,nbmbm,nbmbvnmbvn nmhjytrftrf
       </div>
-
-
     </div>
   </main>
 </template>

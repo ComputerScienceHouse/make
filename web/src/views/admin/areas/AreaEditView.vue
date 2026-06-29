@@ -96,7 +96,6 @@ async function saveArea(area: Area) {
     <LoadingScreen></LoadingScreen>
   </main>
 
-
   <main class="container" v-else-if="area && trainings">
     <div class="d-flex justify-content-between align-items-center">
       <h1>Editing "{{ area?.name }}"</h1>

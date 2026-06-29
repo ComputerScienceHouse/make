@@ -65,7 +65,6 @@ onMounted(async () => {
     <LoadingScreen></LoadingScreen>
   </main>
 
-
   <main class="container py-4" v-else-if="area">
     <div class="position-relative rounded overflow-hidden mb-4" style="height: 280px">
       <img :src="area.photourl" :alt="area.name" class="w-100 h-100 object-fit-cover" />

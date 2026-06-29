@@ -48,7 +48,6 @@ onMounted(async () => {
     <LoadingScreen></LoadingScreen>
   </main>
 
-
   <main class="container" v-else>
     <div class="d-flex justify-content-between align-items-center">
       <h1>Trainings:</h1>

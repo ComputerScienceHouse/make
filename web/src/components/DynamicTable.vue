@@ -54,16 +54,16 @@ const cols = computed(() => {
   return keys.filter((col) => !options.fields?.[col]?.hidden)
 })
 
-async function deleteRow(row: T) { 
+async function deleteRow(row: T) {
   try {
     await options.actions?.delete?.handler(row)
 
     const idx = data.indexOf(row)
-    if(idx !== -1) {
-     data.splice(idx, 1); 
+    if (idx !== -1) {
+      data.splice(idx, 1)
     }
   } catch (err) {
-    error.value = "Error while deleting row"
+    error.value = 'Error while deleting row'
     console.error(err)
   }
 }

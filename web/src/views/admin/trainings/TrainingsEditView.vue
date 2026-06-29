@@ -60,7 +60,6 @@ async function saveTraining(t: TrainingFull) {
     <LoadingScreen></LoadingScreen>
   </main>
 
-
   <main class="container py-4" v-else-if="training">
     <div class="d-flex align-items-center justify-content-between">
       <div class="flex-grow-1 me-3">

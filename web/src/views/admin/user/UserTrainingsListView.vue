@@ -50,9 +50,9 @@ const tableOptions: TableOptions<UserTraining> = {
 }
 
 async function loadTrainings() {
-  const member = members.value.find((m) => 
-  `${m.name} (${m.username})` === memberSearch.value
-  ||  m.username === memberSearch.value)
+  const member = members.value.find(
+    (m) => `${m.name} (${m.username})` === memberSearch.value || m.username === memberSearch.value,
+  )
 
   if (!member) {
     alert('Please select a valid member.')
@@ -61,7 +61,7 @@ async function loadTrainings() {
 
   selectedMember.value = member
 
-  router.push({ query: { user: member.username }})
+  router.push({ query: { user: member.username } })
 
   try {
     trainingsLoading.value = true
@@ -98,7 +98,7 @@ onMounted(async () => {
 
     // if url query has a username
     const username = route.query.user
-    if (typeof username === "string") {
+    if (typeof username === 'string') {
       memberSearch.value = username
       loadTrainings()
     }
@@ -121,7 +121,6 @@ onMounted(async () => {
     <LoadingScreen></LoadingScreen>
   </main>
 
-
   <main class="container" v-else>
     <h1 class="mb-4">Editing User Trainings</h1>
     <div class="mb-4">
@@ -140,7 +139,11 @@ onMounted(async () => {
       </div>
 
       <datalist id="memberOptions">
-        <option v-for="member in members" :key="member.uuid" :value="`${member.name} (${member.username})`" />
+        <option
+          v-for="member in members"
+          :key="member.uuid"
+          :value="`${member.name} (${member.username})`"
+        />
       </datalist>
     </div>
 
