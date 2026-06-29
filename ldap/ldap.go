@@ -3,7 +3,6 @@ package ldap
 import (
 	"errors"
 	"fmt"
-	"log"
 	"os"
 	"strings"
 
@@ -19,8 +18,12 @@ func createLDAPConnection() (*ldap.Conn, error) {
 	bindDN := os.Getenv("MAKE_LDAP_BIND_DN")
 	password := os.Getenv("MAKE_LDAP_PASS")
 
+	if bindDN == "" || password == "" {
+		return nil, errors.New("LDAP credentials not configured")
+	}
+
 	if err := conn.Bind(bindDN, password); err != nil {
-		log.Fatalf("bind failed: %v", err)
+		return nil, err
 	}
 
 	return conn, nil
@@ -29,6 +32,7 @@ func createLDAPConnection() (*ldap.Conn, error) {
 type UserWUUID struct {
 	Username string `json:"username"`
 	UUID     string `json:"uuid"`
+	Name     string `json:"name"`
 }
 
 func GetGroupMembers(group string) ([]UserWUUID, error) {
@@ -38,53 +42,35 @@ func GetGroupMembers(group string) ([]UserWUUID, error) {
 	}
 	defer conn.Close()
 
-	groupSearch := ldap.NewSearchRequest(
-		"cn=groups,cn=accounts,dc=csh,dc=rit,dc=edu",
+	groupDN := fmt.Sprintf(
+		"cn=%s,cn=groups,cn=accounts,dc=csh,dc=rit,dc=edu",
+		ldap.EscapeDN(group),
+	)
+
+	search := ldap.NewSearchRequest(
+		"cn=users,cn=accounts,dc=csh,dc=rit,dc=edu",
 		ldap.ScopeWholeSubtree,
 		ldap.NeverDerefAliases,
-		1,
+		0,
 		0,
 		false,
-		fmt.Sprintf("(cn=%s)", ldap.EscapeFilter(group)),
-		[]string{"member"},
+		fmt.Sprintf("(memberOf=%s)", ldap.EscapeFilter(groupDN)),
+		[]string{"uid", "ipaUniqueID", "cn"},
 		nil,
 	)
 
-	res, err := conn.Search(groupSearch)
+	res, err := conn.Search(search)
 	if err != nil {
 		return nil, err
 	}
 
-	if len(res.Entries) == 0 {
-		return nil, errors.New("group not found")
-	}
-
 	var users []UserWUUID
 
-	for _, memberDN := range res.Entries[0].GetAttributeValues("member") {
-
-		userSearch := ldap.NewSearchRequest(
-			memberDN,
-			ldap.ScopeBaseObject,
-			ldap.NeverDerefAliases,
-			1,
-			0,
-			false,
-			"(objectClass=*)",
-			[]string{"uid", "ipaUniqueID"},
-			nil,
-		)
-
-		uRes, err := conn.Search(userSearch)
-		if err != nil || len(uRes.Entries) == 0 {
-			continue
-		}
-
-		e := uRes.Entries[0]
-
+	for _, entry := range res.Entries {
 		users = append(users, UserWUUID{
-			Username: e.GetAttributeValue("uid"),
-			UUID:     e.GetAttributeValue("ipaUniqueID"),
+			Username: entry.GetAttributeValue("uid"),
+			UUID:     entry.GetAttributeValue("ipaUniqueID"),
+			Name:     entry.GetAttributeValue("cn"),
 		})
 	}
 
