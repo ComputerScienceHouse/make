@@ -107,10 +107,10 @@ onMounted(async () => {
         <LoadingScreen></LoadingScreen>
       </div>
 
-      <div v-if="error" class="text-danger">Error while loading areas</div>
+      <div v-else-if="error" class="text-danger">{{ error }}</div>
 
-      <div v-if="areas.length === 0 && !loading">
-        No areas found, add some!!nh nb ,mnbm,nbmbm,nbmbvnmbvn nmhjytrftrf
+      <div v-else-if="areas.length === 0" class="text-muted">
+        No areas found.
       </div>
     </div>
   </main>
