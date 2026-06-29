@@ -1,6 +1,9 @@
 # make
 a web-based platform for managing safety seminars and special-use room access
 
+## documentation
+Any hosted instance has swagger API documentation available at the endpoint `/swagger/index.html`
+
 ## building for production
 
 make utilizes Go's embed features to allow for the entire project, including database 
