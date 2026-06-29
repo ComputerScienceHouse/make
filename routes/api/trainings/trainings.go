@@ -8,7 +8,6 @@ import (
 	"makedotcsh/models"
 	"makedotcsh/utils"
 	"strconv"
-	"time"
 
 	"github.com/gin-gonic/gin"
 )
@@ -302,77 +301,16 @@ func submitCompletedTraining(c *gin.Context) {
 		return
 	}
 
-	training, err := database.Helper.GetTraining(id, true)
-	if err != nil {
-		c.Error(err)
-		return
-	}
-
-	//TODO: remove this not needed too lazy rn
-	answers, err := database.Helper.GetTrainingAnswers(id)
-	if err != nil {
-		c.Error(err)
-		return
-	}
-
 	user, err := utils.GetCSHAuth(c)
 	if err != nil {
 		c.Error(err)
 		return
 	}
 
-	if len(answers) != len(req) {
-		c.JSON(400, gin.H{
-			"error": "invalid submission",
-		})
+	res, err := utils.GradeTraining(id, user.Uuid, req)
+	if err != nil {
+		c.Error(err)
 		return
-	}
-
-	var gradedSubmission map[int]bool = map[int]bool{}
-	correct := 0
-	incorrect := 0
-	totalQuestions := len(answers)
-
-	// grade answers
-	for id, r := range req {
-		isCorrect := answers[id] == r
-		gradedSubmission[id] = isCorrect
-
-		if isCorrect {
-			correct++
-		} else {
-			incorrect++
-		}
-	}
-
-	passed := correct >= training.RequiredCorrect
-
-	res := models.SubmissionResponse{
-		Passed:       passed,
-		NumCorrect:   correct,
-		NumIncorrect: incorrect,
-		Grade:        int((float64(correct) / float64(totalQuestions)) * 100),
-	}
-
-	if passed {
-		//TODO: this needs to be refined when
-		// we formally define when a saftey seminar should
-		// expire after completion
-		now := time.Now()
-		future := now.AddDate(1, 0, 0)
-
-		newUserTraining := models.UserTraining{
-			UserUUID:    user.Uuid,
-			TrainingID:  training.ID,
-			CompletedAt: now,
-			ExpiresAt:   future,
-		}
-
-		err = database.Helper.CreateUserTraining(newUserTraining)
-		if err != nil {
-			c.Error(err)
-			return
-		}
 	}
 
 	c.JSON(200, res)
