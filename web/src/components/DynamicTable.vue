@@ -27,7 +27,10 @@ interface Props<T> {
 
 const props = defineProps<Props<T>>()
 
-const selectedRows = defineModel<T[]>({ default: [] })
+const selectedRows = defineModel<T[]>({
+  default: (): T[] => []
+})
+
 function toggleRow(row: T, checked: boolean) {
   if (checked) {
     if (!selectedRows.value.includes(row)) {
