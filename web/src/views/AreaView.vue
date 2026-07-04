@@ -1,153 +1,212 @@
 <script setup lang="ts">
-import { ref, onMounted } from "vue";
-import { useRoute } from "vue-router";
+import { authState } from '@/auth'
+import LoadingScreen from '@/components/LoadingScreen.vue'
+import type { Area } from '@/models/areas'
+import type { Training, UserTraining } from '@/models/trainings'
+import { ref, onMounted, computed } from 'vue'
+import { useRoute } from 'vue-router'
 
-interface Area {
-    id: number;
-    name: string;
-    description: string;
-}
+const user = authState.user
 
-const area = ref<Area | null>(null);
-const loading = ref(true);
-const notFound = ref(false);
+const area = ref<Area | null>(null)
+const trainings = ref<Training[] | null>(null)
+const userTrainings = ref<UserTraining[] | null>(null)
+const loading = ref(true)
+const notFound = ref(false)
 
-const route = useRoute();
+const completedAllTrainings = computed(() => {
+  return (
+    trainings.value?.every((t) => userTrainings.value?.some((tr) => tr.trainingId == t.id)) || false
+  )
+})
+
+const progress = computed(() => {
+  if (!trainings.value?.length) return 0
+
+  const requiredTrainings = trainings.value.map((t) => t.id)
+  const completedRequiredTrainings = userTrainings.value?.filter((training) =>
+    requiredTrainings.includes(training.trainingId),
+  )
+  return ((completedRequiredTrainings?.length || 0) / requiredTrainings.length) * 100
+})
+const route = useRoute()
 
 onMounted(async () => {
-    try {
-        const response = await fetch(
-            `/api/areas/${route.params.id}`
-        );
+  try {
+    loading.value = true
 
-        if (response.ok) {
-            area.value = await response.json();
-        } else if (response.status === 404) {
-            notFound.value = true;
-        } else {
-            throw new Error("Failed to fetch area");
-        }
-    } catch (err) {
-        console.error(err);
-    } finally {
-        loading.value = false;
+    const [areaRes, trainingsRes, userTrainingsRes] = await Promise.all([
+      fetch(`/api/areas/${route.params.id}`),
+      fetch(`/api/trainings/area/${route.params.id}`),
+      fetch(`/api/user/${user?.uuid}/trainings`),
+    ])
+
+    if (areaRes.status === 404) {
+      notFound.value = true
     }
-});
+
+    if (!areaRes.ok || !trainingsRes.ok || !userTrainingsRes.ok) {
+      throw new Error('Failed to fetch data')
+    }
+
+    area.value = await areaRes.json()
+    trainings.value = await trainingsRes.json()
+    userTrainings.value = await userTrainingsRes.json()
+  } catch (err) {
+    console.error(err)
+  } finally {
+    loading.value = false
+  }
+})
 </script>
 
 <template>
-    <main class="container py-4" v-if="loading">
-        <h1>Loading...</h1>
-    </main>
+  <main class="container py-4" v-if="loading">
+    <LoadingScreen></LoadingScreen>
+  </main>
 
-    <main class="container py-4" v-else-if="area">
-        <div class="position-relative rounded overflow-hidden mb-4" style="height: 280px;">
-            <img src="https://i.kym-cdn.com/photos/images/newsfeed/002/720/384/928.jpeg" :alt="area.name"
-                class="w-100 h-100 object-fit-cover" />
+  <main class="container py-4" v-else-if="area">
+    <div class="position-relative rounded overflow-hidden mb-4" style="height: 280px">
+      <img :src="area.photourl" :alt="area.name" class="w-100 h-100 object-fit-cover" />
 
-            <div class="position-absolute top-0 start-0 w-100 h-100 image-gradient"></div>
+      <div class="position-absolute top-0 start-0 w-100 h-100 image-gradient"></div>
 
-            <div class="position-absolute bottom-0 start-0 p-4 text-white">
-                <h1 class="mb-1">{{ area.name }}</h1>
-                <p class="mb-0">
-                    {{ area.description }}
-                </p>
-            </div>
-        </div>
+      <!-- admin only button -->
+      <RouterLink
+        v-if="authState.isAdmin()"
+        :to="`/admin/areas/${area.id}`"
+        class="btn btn-primary position-absolute top-0 end-0 m-3 shadow-sm"
+      >
+        <i class="bi bi-pencil-square"></i>
+      </RouterLink>
 
-        <div class="row g-4">
-            <div class="col-lg-4">
-                <div class="card h-100">
-                    <div class="card-body">
-                        <h5 class="card-title">Your Status</h5>
-
-                        <p class="mb-2">
-                            <span class="badge text-bg-success">
-                                Certified
-                            </span>
-                        </p>
-
-                        <small class="text-body-secondary">
-                            You have completed all the bs
-                        </small>
-                    </div>
-                </div>
-            </div>
-
-            <div class="col-lg-8">
-                <div class="card h-100">
-                    <div class="card-body">
-                        <h5 class="card-title mb-3">
-                            Required Training
-                        </h5>
-
-                        <ul class="list-group list-group-flush">
-                            <li class="list-group-item d-flex justify-content-between">
-                                general shit
-                                <span class="badge text-bg-success">
-                                    Complete
-                                </span>
-                            </li>
-
-                            <li class="list-group-item d-flex justify-content-between">
-                                lab shit
-                                <span class="badge text-bg-success">
-                                    Complete
-                                </span>
-                            </li>
-
-                            <li class="list-group-item d-flex justify-content-between">
-                                soldering shit
-                                <span class="badge text-bg-warning">
-                                    Required
-                                </span>
-                            </li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="card mt-4">
-            <div class="card-body">
-                <h5 class="card-title">Resources</h5>
-
-                <div class="d-flex gap-2 flex-wrap">
-                    <button class="btn btn-outline-primary btn-sm">
-                        Safety Rules
-                    </button>
-
-                    <button class="btn btn-outline-primary btn-sm">
-                        Equipment Guide
-                    </button>
-                </div>
-            </div>
-        </div>
-    </main>
-
-    <main class="container py-4" v-else-if="notFound">
-        <h1>Area Not Found</h1>
-        <p class="text-body-secondary">
-            The requested workshop does not exist.
+      <div class="position-absolute bottom-0 start-0 p-4 text-white">
+        <h1 class="mb-1">{{ area.name }}</h1>
+        <p class="mb-0">
+          {{ area.description }}
         </p>
-    </main>
+      </div>
+    </div>
 
-    <main class="container py-4" v-else>
-        <h1>Something went wrong.</h1>
-        <p class="text-body-secondary">
-            Unable to load this area right now.
-        </p>
-    </main>
+    <div class="row g-4">
+      <div class="col-lg-4">
+        <div class="card h-100">
+          <div class="card-body d-flex flex-column">
+            <div class="d-flex align-items-center justify-content-between mb-3">
+              <h5 class="card-title mb-0">Your Status</h5>
+
+              <span
+                class="badge"
+                :class="completedAllTrainings ? 'text-bg-success' : 'text-bg-danger'"
+              >
+                {{ completedAllTrainings ? 'Certified' : 'Incomplete' }}
+              </span>
+            </div>
+
+            <p class="mb-1 fw-semibold">
+              {{ completedAllTrainings ? 'All training complete' : 'Training required' }}
+            </p>
+
+            <small v-if="completedAllTrainings" class="text-body-secondary mb-3">
+              You have completed all the bs
+            </small>
+            <small v-else class="text-body-secondary mb-3">
+              Complete all required training to gain access {{ area.name }}
+            </small>
+
+            <div class="mt-auto">
+              <div class="progress" style="height: 6px">
+                <div
+                  class="progress-bar progress-bar-animated progress-bar-striped"
+                  role="progressbar"
+                  aria-valuenow="0"
+                  aria-valuemin="0"
+                  aria-valuemax="100"
+                  :style="{ width: progress + '%' }"
+                ></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-lg-8">
+        <div class="card h-100">
+          <div class="card-body">
+            <h5 class="card-title mb-3">Required Trainings</h5>
+
+            <ul class="list-group list-group-flush">
+              <li
+                v-if="trainings?.length === 0"
+                class="list-group-item d-flex justify-content-between text-muted"
+              >
+                No trainings associated with area
+              </li>
+              <li
+                v-for="training in trainings"
+                :key="training.id"
+                class="list-group-item d-flex justify-content-between"
+              >
+                <RouterLink :to="`/training/${training.id}`" class="training-link">
+                  {{ training.title }}
+                </RouterLink>
+
+                <span
+                  v-if="userTrainings?.some((t) => t.trainingId === training.id)"
+                  class="badge text-bg-success"
+                >
+                  Completed
+                </span>
+                <span v-else class="badge text-bg-warning"> Required </span>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card mt-4">
+      <div class="card-body">
+        <h5 class="card-title">Resources</h5>
+
+        <div class="d-flex gap-2 flex-wrap">
+          <button class="btn btn-outline-primary btn-sm">Safety Rules</button>
+
+          <button class="btn btn-outline-primary btn-sm">Equipment Guide</button>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <main class="container py-4" v-else-if="notFound">
+    <h1>Area Not Found</h1>
+    <p class="text-body-secondary">The requested workshop does not exist.</p>
+  </main>
+
+  <main class="container py-4" v-else>
+    <h1>Something went wrong.</h1>
+    <p class="text-body-secondary">Unable to load this area right now.</p>
+  </main>
 </template>
-
 
 <style scoped>
 .image-gradient {
-    background:
-        linear-gradient(to top,
-            rgba(0, 0, 0, .8) 0%,
-            rgba(0, 0, 0, .4) 40%,
-            rgba(0, 0, 0, .1) 70%,
-            rgba(0, 0, 0, 0) 100%);
+  background: linear-gradient(
+    to top,
+    rgba(0, 0, 0, 0.8) 0%,
+    rgba(0, 0, 0, 0.4) 40%,
+    rgba(0, 0, 0, 0.1) 70%,
+    rgba(0, 0, 0, 0) 100%
+  );
+}
+
+.training-link {
+  text-decoration: none;
+  color: var(--bs-dark);
+}
+
+.training-link:hover {
+  color: var(--bs-primary);
+  text-decoration: underline;
 }
 </style>

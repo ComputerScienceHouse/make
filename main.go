@@ -1,11 +1,18 @@
 package main
 
 import (
-	"fmt"
+	"embed"
+	"io/fs"
 	"log"
 	"makedotcsh/database"
 	"makedotcsh/routes"
+	"makedotcsh/worker"
+	"net/http"
 	"os"
+	"strings"
+	"time"
+
+	_ "makedotcsh/docs"
 
 	cshauth "github.com/computersciencehouse/csh-auth/v2"
 	"github.com/gin-contrib/cors"
@@ -13,33 +20,64 @@ import (
 	"github.com/gin-contrib/logger"
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
 )
+
+//go:embed web/dist/*
+var staticFS embed.FS
+var distFS fs.FS
+var assetsFS fs.FS
 
 func errorHandler(c *gin.Context) {
 	c.Next()
 
+	if c.Writer.Written() {
+		return
+	}
+
 	err := c.Errors.Last()
 	if err != nil {
-		c.JSON(500, gin.H{
+		c.AbortWithStatusJSON(500, gin.H{
 			"error": "Internal server error",
 		})
 	}
 }
 
 func serveIndex(c *gin.Context) {
-	c.File("./web/dist/index.html")
+	data, err := fs.ReadFile(distFS, "index.html")
+	if err != nil {
+		c.String(500, err.Error())
+		return
+	}
+
+	c.Data(200, "text/html; charset=utf-8", data)
 }
 
+// @title		makedotcsh API
+// @host		localhost:8080
+// @BasePath	/api/
 func main() {
 	godotenv.Load()
 	router := gin.New()
 
 	host := os.Getenv("MAKE_HOST")
 
-	fmt.Println(os.Getenv("MAKE_OIDC_ID"))
+	var err error
+	// init embed fs
+	distFS, err = fs.Sub(staticFS, "web/dist")
+	if err != nil {
+		panic(err)
+	}
+
+	assetsFS, err = fs.Sub(distFS, "assets")
+	if err != nil {
+		panic(err)
+	}
 
 	// init db
 	database.Init()
+	defer database.DB.Close()
 
 	// init auth
 	auth, err := cshauth.Init(
@@ -55,6 +93,9 @@ func main() {
 		log.Panicf("Error initializing CSH auth %v", err)
 	}
 
+	// start worker
+	worker.StartWorker(10*time.Minute, worker.WorkerTrigger)
+
 	router.Use(gzip.Gzip(gzip.DefaultCompression))
 	router.Use(cors.Default())
 	router.Use(logger.SetLogger())
@@ -69,18 +110,25 @@ func main() {
 	routes.SetRoutes(router, auth)
 
 	// frontend
-	frontend := router.Group("/")
-	frontend.Use(auth.CookieMiddleware())
-
 	if os.Getenv("DEV") == "true" {
-		router.NoRoute(createViteProxy())
+		router.NoRoute(auth.CookieMiddleware(), createViteProxy())
 	} else {
-		frontend.Static("/assets", "./web/dist/assets")
-		frontend.GET("/", serveIndex)
-		frontend.GET("/:path", serveIndex)
-		frontend.GET("/:path/*rest", serveIndex)
+		gin.SetMode(gin.ReleaseMode)
+
+		router.StaticFS("/assets", http.FS(assetsFS))
+
+		router.NoRoute(auth.CookieMiddleware(), func(c *gin.Context) {
+			if strings.HasPrefix(c.Request.URL.Path, "/api") {
+				c.JSON(404, gin.H{"error": "not found"})
+				return
+			}
+			serveIndex(c)
+		})
 	}
 
-	log.Println("running")
-	router.Run()
+	// swag
+	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
+
+	log.Println("[MAIN] server started")
+	log.Fatal(router.Run())
 }
