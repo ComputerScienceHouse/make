@@ -109,9 +109,7 @@ onMounted(async () => {
 
       <div v-else-if="error" class="text-danger">{{ error }}</div>
 
-      <div v-else-if="areas.length === 0" class="text-muted">
-        No areas found.
-      </div>
+      <div v-else-if="areas.length === 0" class="text-muted">No areas found.</div>
     </div>
   </main>
 </template>
