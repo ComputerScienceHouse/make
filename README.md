@@ -4,6 +4,55 @@ a web-based platform for managing safety seminars and special-use room access
 ## documentation
 Any hosted instance has swagger API documentation available at the endpoint `/swagger/index.html`
 
+## environment variables
+
+make is configured entirely through environment variables. These can be supplied using a `.env` file or passed directly to the executable or Docker container.
+
+| Variable            | Description |
+|---------------------|-------------|
+| `MAKE_HOST`         | Public URL of the application (ex `http://localhost:8080`) |
+| `MAKE_OIDC_ID`      | OIDC public ID |
+| `MAKE_OIDC_SECRET`  | OIDC secret |
+| `MAKE_LDAP_BIND_DN` | LDAP bind DN used for directory queries |
+| `MAKE_LDAP_PASS`    | Password for the LDAP bind account |
+| `MAKE_DB_HOST`      | Database hostname ex (`postgres.example.com`) |
+| `MAKE_DB_NAME`      | Database name |
+| `MAKE_DB_USER`      | Database username |
+| `MAKE_DB_PASS`      | Database password |
+| `MAKE_ENABLE_WRITE` | Enables the worker and will add the configured LDAP roles to users upon training submission |
+| `DEV`               | Exables frontend VITE proxy (only for local development) |
+
+Boilerplate .env:
+```
+MAKE_OIDC_ID=
+MAKE_OIDC_SECRET=
+MAKE_HOST=
+MAKE_LDAP_BIND_DN=
+MAKE_LDAP_PASS=
+MAKE_DB_HOST=
+MAKE_DB_NAME=
+MAKE_DB_USER=
+MAKE_DB_PASS=
+MAKE_DISABLE_WRITE=
+DEV=
+```
+
+## worker
+make features a worker responsible for synchronizing user training status with LDAP group memberships. The worker runs every 10 minutes and whenever a training is submitted.
+
+When the worker is ran, it will perform the following tasks:
+1. Fetch all user beloning the the LDAP groups associated with each area
+2. Verifies that each user's training for that area is still valid
+3. Removes the corresponding LDAP role if the user's training is no longer valid
+4. Fetches all users who have completed a training, and determines which areas they have access to
+5. Adds any missing LDAP groups idempotently for users with access to an area
+
+A user's training can become valid for several reasons:
+- The training was revoked by an admin
+- The training has expired
+
+The worker will NOT attempt to modify users who inherit group memberships hierarchically through LDAP (FreeIPA nested memberships). Only users with directly managed group memberships are modified (usually manually entered through FreeIPA or through make). Hierarchically managed group memberships always take precedence over those managed by make.
+
 ## building for production
 
 make utilizes Go's embed features to allow for the entire project, including database 
