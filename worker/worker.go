@@ -6,6 +6,7 @@ import (
 	"makedotcsh/database"
 	"makedotcsh/ldap"
 	"makedotcsh/models"
+	"os"
 	"slices"
 	"time"
 
@@ -13,13 +14,21 @@ import (
 )
 
 var WorkerTrigger = make(chan struct{})
+var write = os.Getenv("MAKE_ENABLE_WRITE")
 
 func TriggerWorker() {
-	WorkerTrigger <- struct{}{}
+	if write == "true" {
+		WorkerTrigger <- struct{}{}
+	}
 }
 
 func StartWorker(interval time.Duration, manual <-chan struct{}) {
 	go func() {
+		if write != "true" {
+			log.Println("[WORKER] Writing was disable by environment variable, disabling worker.")
+			return
+		}
+
 		ticker := time.NewTicker(interval)
 		defer ticker.Stop()
 
