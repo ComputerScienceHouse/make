@@ -4,6 +4,7 @@ import (
 	"errors"
 	"makedotcsh/database"
 	"makedotcsh/models"
+	"makedotcsh/worker"
 	"time"
 
 	csh_auth "github.com/computersciencehouse/csh-auth/v2"
@@ -76,24 +77,33 @@ func GradeTraining(trainingId int, userUUID string, submission models.Submission
 	}
 
 	if passed {
-		//TODO: this needs to be refined when
-		// we formally define when a saftey seminar should
-		// expire after completion
-		now := time.Now()
-		future := now.AddDate(1, 0, 0)
+		SubmitTraining(userUUID, training)
 
-		newUserTraining := models.UserTraining{
-			UserUUID:    userUUID,
-			TrainingID:  training.ID,
-			CompletedAt: now,
-			ExpiresAt:   future,
-		}
-
-		err = database.Helper.CreateUserTraining(newUserTraining)
-		if err != nil {
-			return models.SubmissionResponse{}, err
-		}
+		// trigger worker to update ldap groups
+		worker.TriggerWorker()
 	}
 
 	return res, nil
+}
+
+func SubmitTraining(uuid string, training models.Training) error {
+	//TODO: this needs to be refined when
+	// we formally define when a saftey seminar should
+	// expire after completion
+	now := time.Now()
+	future := now.AddDate(1, 0, 0)
+
+	newUserTraining := models.UserTraining{
+		UserUUID:    uuid,
+		TrainingID:  training.ID,
+		CompletedAt: now,
+		ExpiresAt:   future,
+	}
+
+	err := database.Helper.CreateUserTraining(newUserTraining)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }

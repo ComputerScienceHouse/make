@@ -12,6 +12,7 @@ import (
 )
 
 var DB *sql.DB
+var err error
 
 type DatabaseHelper struct {
 	DB *sql.DB
@@ -20,8 +21,6 @@ type DatabaseHelper struct {
 var Helper *DatabaseHelper
 
 func Init() {
-	var DB *sql.DB
-
 	host := os.Getenv("MAKE_DB_HOST")
 	name := os.Getenv("MAKE_DB_NAME")
 	user := os.Getenv("MAKE_DB_USER")
@@ -29,7 +28,7 @@ func Init() {
 	dbOptions := fmt.Sprintf("postgres://%s:%s@%s/%s", url.QueryEscape(user), url.QueryEscape(pass), host, url.PathEscape(name))
 
 	log.Println("[DB] Connecting to database...")
-	DB, err := sql.Open("postgres", dbOptions)
+	DB, err = sql.Open("postgres", dbOptions)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -393,13 +392,13 @@ func (database *DatabaseHelper) CreateUserTraining(training models.UserTraining)
 	return nil
 }
 
-func (database *DatabaseHelper) GetCompletedUserTrainings(uuid string) ([]int, error) {
+func (database *DatabaseHelper) GetCompletedUserTrainings(uuid string) ([]models.UserTraining, error) {
 	rows, err := database.DB.Query("SELECT user_uuid, training_id, completed_at, expires_at FROM user_trainings WHERE user_uuid = $1", uuid)
 	if err != nil {
-		return []int{}, err
+		return []models.UserTraining{}, err
 	}
 
-	var trainings []int = []int{}
+	var trainings []models.UserTraining = []models.UserTraining{}
 
 	for rows.Next() {
 		var usertraining models.UserTraining
@@ -412,34 +411,41 @@ func (database *DatabaseHelper) GetCompletedUserTrainings(uuid string) ([]int, e
 		)
 
 		if err != nil {
-			return []int{}, err
+			return []models.UserTraining{}, err
 		}
 
-		trainings = append(trainings, usertraining.TrainingID)
+		trainings = append(trainings, usertraining)
 	}
 
 	return trainings, nil
 }
 
-func (database *DatabaseHelper) GetUserTraining(trainingID int) (models.UserTraining, error) {
-	row := database.DB.QueryRow("SELECT user_uuid, training_id, completed_at, expires_at FROM user_trainings WHERE training_id = $1", trainingID)
-
-	var training models.UserTraining
-
-	err := row.Scan(
-		&training.UserUUID,
-		&training.TrainingID,
-		&training.CompletedAt,
-		&training.ExpiresAt,
-	)
-
+func (database *DatabaseHelper) GetAllUserTrainings() ([]models.UserTraining, error) {
+	rows, err := database.DB.Query("SELECT user_uuid, training_id, completed_at, expires_at FROM user_trainings")
 	if err != nil {
-		return models.UserTraining{}, err
+		return []models.UserTraining{}, err
 	}
 
-	// check training validity while pulling
+	var trainings []models.UserTraining = []models.UserTraining{}
 
-	return training, nil
+	for rows.Next() {
+		var usertraining models.UserTraining
+
+		err := rows.Scan(
+			&usertraining.UserUUID,
+			&usertraining.TrainingID,
+			&usertraining.CompletedAt,
+			&usertraining.ExpiresAt,
+		)
+
+		if err != nil {
+			return []models.UserTraining{}, err
+		}
+
+		trainings = append(trainings, usertraining)
+	}
+
+	return trainings, nil
 }
 
 func (database *DatabaseHelper) DeleteTrainingFromUser(trainingID int, uuid string) error {

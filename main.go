@@ -6,9 +6,11 @@ import (
 	"log"
 	"makedotcsh/database"
 	"makedotcsh/routes"
+	"makedotcsh/worker"
 	"net/http"
 	"os"
 	"strings"
+	"time"
 
 	_ "makedotcsh/docs"
 
@@ -91,6 +93,9 @@ func main() {
 		log.Panicf("Error initializing CSH auth %v", err)
 	}
 
+	// start worker
+	worker.StartWorker(10*time.Minute, worker.WorkerTrigger)
+
 	router.Use(gzip.Gzip(gzip.DefaultCompression))
 	router.Use(cors.Default())
 	router.Use(logger.SetLogger())
@@ -124,6 +129,6 @@ func main() {
 	// swag
 	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
-	log.Println("Started!")
+	log.Println("[MAIN] server started")
 	log.Fatal(router.Run())
 }

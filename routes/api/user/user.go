@@ -18,19 +18,7 @@ func getUserTrainings(c *gin.Context) {
 		return
 	}
 
-	trainings := []models.UserTraining{}
-
-	for _, id := range userTrainings {
-		training, err := database.Helper.GetUserTraining(id)
-		if err != nil {
-			c.Error(err)
-			return
-		}
-
-		trainings = append(trainings, training)
-	}
-
-	c.JSON(200, trainings)
+	c.JSON(200, userTrainings)
 }
 
 func createUserTraining(c *gin.Context) {
