@@ -36,7 +36,7 @@ onMounted(async () => {
     <p>The central hub for training and resources for CSH's special-use rooms.</p>
     <h1>Profile</h1>
 
-    <div class="card mb-4 shadow-sm">
+    <div class="card mb-4 shadow-sm pe-none">
       <div class="d-flex flex-column flex-sm-row justify-content-between">
         <div class="card-body d-flex align-items-center gap-3">
           <img
