@@ -29,7 +29,6 @@ function logout() {
       </button>
       <div class="collapse navbar-collapse" id="navbarResponsive">
         <ul class="navbar-nav mr-auto">
-          <RouterLink class="nav-link" to="/">Areas</RouterLink>
           <RouterLink v-if="authState.isAdmin()" class="nav-link" to="/admin">Admin</RouterLink>
         </ul>
         <ul v-if="user" class="nav navbar-nav ms-auto">
