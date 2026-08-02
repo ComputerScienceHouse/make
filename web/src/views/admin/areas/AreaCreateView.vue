@@ -29,7 +29,7 @@ async function saveArea(area: Area) {
     throw new Error(`Failed to save area: ${res.status}`)
   }
 
-  router.push({ path: `/areas/${area.id}` })
+  router.push({ path: `/` })
 
   return
 }
