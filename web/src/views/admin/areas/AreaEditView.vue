@@ -9,15 +9,19 @@ import DynamicTable from '@/components/DynamicTable.vue'
 import type { TableOptions } from '@/components/DynamicTable.vue'
 import AddTrainingPopup from '@/components/AddTrainingPopup.vue'
 import LoadingScreen from '@/components/LoadingScreen.vue'
+import type { Resource } from '@/models/resources'
+import AddResourcePopup from '@/components/AddResourcePopup.vue'
 
 const area = ref<Area>()
 const trainings = ref<Training[]>()
+const resources = ref<Resource[]>()
 const loading = ref(true)
 const notFound = ref(false)
 
 const route = useRoute()
 
 const showTrainingModal = ref(false)
+const showResourcesModal = ref(false)
 
 const formOptions: FormOptions<Area> = {
   fields: {
@@ -41,25 +45,45 @@ const tableOptions: TableOptions<Training> = {
     },
   },
 }
+
+const resourcesTableOptions: TableOptions<Resource> = {
+  fields: {
+    //id: { hidden: true },
+  },
+  actions: {
+    delete: {
+      handler: async (t) => {
+        await fetch(`/api/resources/area/${area.value?.id}`, {
+          body: JSON.stringify({ id: t.id }),
+          method: 'DELETE',
+          credentials: 'include',
+        })
+      },
+    },
+  },
+}
+
 onMounted(async () => {
   try {
     loading.value = true
 
-    const [areaRes, trainingRes] = await Promise.all([
+    const [areaRes, trainingRes, resourcesRes] = await Promise.all([
       fetch(`/api/areas/${route.params.id}`),
       fetch(`/api/trainings/area/${route.params.id}`),
+      fetch(`/api/resources/area/${route.params.id}`),
     ])
 
     if (areaRes.status === 404) {
       notFound.value = true
     }
 
-    if (!areaRes.ok || !trainingRes.ok) {
+    if (!areaRes.ok || !trainingRes.ok || !resourcesRes.ok) {
       throw new Error('Failed to fetch data')
     }
 
     area.value = await areaRes.json()
     trainings.value = await trainingRes.json()
+    resources.value = await resourcesRes.json()
   } catch (err) {
     console.error(err)
   } finally {
@@ -92,11 +116,18 @@ async function saveArea(area: Area) {
   >
   </AddTrainingPopup>
 
+  <AddResourcePopup
+    v-if="showResourcesModal && area"
+    :areaid="area.id"
+    @close="showResourcesModal = false"
+  >
+  </AddResourcePopup>
+
   <main class="container py-4" v-if="loading">
     <LoadingScreen></LoadingScreen>
   </main>
 
-  <main class="container" v-else-if="area && trainings">
+  <main class="container" v-else-if="area && trainings && resources">
     <div class="d-flex justify-content-between align-items-center">
       <h1>Editing "{{ area?.name }}"</h1>
     </div>
@@ -111,6 +142,15 @@ async function saveArea(area: Area) {
     </div>
 
     <DynamicTable :data="trainings" :options="tableOptions"></DynamicTable>
+
+    <div class="d-flex justify-content-between align-items-center">
+      <h1>Associated Resources:</h1>
+      <button type="button" class="btn btn-primary" @click="showResourcesModal = true">
+        <i class="bi-plus-lg"></i>
+      </button>
+    </div>
+
+    <DynamicTable :data="resources" :options="resourcesTableOptions"></DynamicTable>
   </main>
 </template>
 

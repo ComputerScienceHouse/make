@@ -40,6 +40,23 @@ const sections = [
       },
     ],
   },
+  {
+    title: 'Resources',
+    items: [
+      {
+        title: 'Resources',
+        description: 'Manage resources.',
+        path: '/admin/resources',
+        icon: 'bi-rulers',
+      },
+      {
+        title: 'Create Resources',
+        description: 'Create a new resource.',
+        path: '/admin/resources/create',
+        icon: 'bi-plus-circle',
+      },
+    ],
+  },
 ]
 </script>
 

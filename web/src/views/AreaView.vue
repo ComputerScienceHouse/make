@@ -3,6 +3,7 @@ import { authState } from '@/auth'
 import LoadingScreen from '@/components/LoadingScreen.vue'
 import type { Area } from '@/models/areas'
 import type { Training, UserTraining } from '@/models/trainings'
+import type { Resource } from '@/models/resources'
 import { ref, onMounted, computed } from 'vue'
 import { useRoute } from 'vue-router'
 
@@ -11,6 +12,7 @@ const user = authState.user
 const area = ref<Area | null>(null)
 const trainings = ref<Training[] | null>(null)
 const userTrainings = ref<UserTraining[] | null>(null)
+const resources = ref<Resource[] | null>(null)
 const loading = ref(true)
 const notFound = ref(false)
 
@@ -35,23 +37,25 @@ onMounted(async () => {
   try {
     loading.value = true
 
-    const [areaRes, trainingsRes, userTrainingsRes] = await Promise.all([
+    const [areaRes, trainingsRes, userTrainingsRes, resourcesRes] = await Promise.all([
       fetch(`/api/areas/${route.params.id}`),
       fetch(`/api/trainings/area/${route.params.id}`),
       fetch(`/api/user/${user?.uuid}/trainings`),
+      fetch(`/api/resources/area/${route.params.id}`),
     ])
 
     if (areaRes.status === 404) {
       notFound.value = true
     }
 
-    if (!areaRes.ok || !trainingsRes.ok || !userTrainingsRes.ok) {
+    if (!areaRes.ok || !trainingsRes.ok || !userTrainingsRes.ok || !resourcesRes.ok) {
       throw new Error('Failed to fetch data')
     }
 
     area.value = await areaRes.json()
     trainings.value = await trainingsRes.json()
     userTrainings.value = await userTrainingsRes.json()
+    resources.value = await resourcesRes.json()
   } catch (err) {
     console.error(err)
   } finally {
@@ -165,14 +169,13 @@ onMounted(async () => {
       </div>
     </div>
 
-    <div class="card mt-4">
+    <div class="card mt-4" v-if="resources && resources.length > 0">
       <div class="card-body">
         <h5 class="card-title">Resources</h5>
-
         <div class="d-flex gap-2 flex-wrap">
-          <button class="btn btn-outline-primary btn-sm">Safety Rules</button>
-
-          <button class="btn btn-outline-primary btn-sm">Equipment Guide</button>
+          <a v-for="r in resources" :href="r.url" :key="r.id" target="_blank">
+            <button class="btn btn-outline-primary btn-sm">{{ r.name }}</button>
+          </a>
         </div>
       </div>
     </div>
