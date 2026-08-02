@@ -4,6 +4,7 @@ import type { TableOptions } from '@/components/DynamicTable.vue'
 import { ref, onMounted } from 'vue'
 import LoadingScreen from '@/components/LoadingScreen.vue'
 import type { Resource } from '@/models/resources'
+import { apiFetch } from '@/util/fetch'
 
 const resources = ref<Resource[]>([])
 const loading = ref(true)
@@ -18,7 +19,7 @@ const tableOptions: TableOptions<Resource> = {
     },
     delete: {
       handler: async (resource: Resource) => {
-        await fetch(`/api/resources/${resource.id}`, {
+        await apiFetch(`/api/resources/${resource.id}`, {
           method: 'DELETE',
           credentials: 'include',
         })
@@ -31,7 +32,7 @@ onMounted(async () => {
   try {
     loading.value = true
 
-    const resourceRes = await fetch(`/api/resources/`)
+    const resourceRes = await apiFetch(`/api/resources/`)
 
     if (resourceRes.status === 404) {
       notFound.value = true

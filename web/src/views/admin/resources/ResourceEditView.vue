@@ -4,6 +4,7 @@ import { useRoute } from 'vue-router'
 import DynamicForm, { type FormOptions } from '@/components/DynamicForm.vue'
 import LoadingScreen from '@/components/LoadingScreen.vue'
 import type { Resource } from '@/models/resources'
+import { apiFetch } from '@/util/fetch'
 
 const resource = ref<Resource>()
 const loading = ref(true)
@@ -21,7 +22,7 @@ onMounted(async () => {
   try {
     loading.value = true
 
-    const resourcesRes = await fetch(`/api/resources/${route.params.id}`)
+    const resourcesRes = await apiFetch(`/api/resources/${route.params.id}`)
 
     if (resourcesRes.status === 404) {
       notFound.value = true
@@ -40,7 +41,7 @@ onMounted(async () => {
 })
 
 async function saveResource(resource: Resource) {
-  const res = await fetch(`/api/resources/${resource.id}`, {
+  const res = await apiFetch(`/api/resources/${resource.id}`, {
     method: 'PUT',
     body: JSON.stringify(resource),
     credentials: 'include',

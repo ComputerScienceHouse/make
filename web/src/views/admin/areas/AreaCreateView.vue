@@ -3,6 +3,7 @@ import type { Area } from '@/models/areas'
 import { ref } from 'vue'
 import DynamicForm, { type FormOptions } from '@/components/DynamicForm.vue'
 import router from '@/router'
+import { apiFetch } from '@/util/fetch'
 
 const area = ref<Area>({
   id: 0, // id is ignored by api when creating a new area
@@ -19,7 +20,7 @@ const formOptions: FormOptions<Area> = {
 }
 
 async function saveArea(area: Area) {
-  const res = await fetch(`/api/areas/`, {
+  const res = await apiFetch(`/api/areas/`, {
     method: 'POST',
     body: JSON.stringify(area),
     credentials: 'include',

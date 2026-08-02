@@ -2,6 +2,7 @@
 import LoadingScreen from '@/components/LoadingScreen.vue'
 import TrainingEditForm from '@/components/TrainingEditForm.vue'
 import type { TrainingFull } from '@/models/trainings'
+import { apiFetch } from '@/util/fetch'
 import { onMounted, ref } from 'vue'
 import { useRoute } from 'vue-router'
 
@@ -20,7 +21,7 @@ onMounted(async () => {
   try {
     loading.value = true
 
-    const trainingRes = await fetch(`/api/trainings/${route.params.id}/full`)
+    const trainingRes = await apiFetch(`/api/trainings/${route.params.id}/full`)
 
     if (trainingRes.status === 404) {
       notFound.value = true
@@ -39,7 +40,7 @@ onMounted(async () => {
 })
 
 async function saveTraining(t: TrainingFull) {
-  const res = await fetch(`/api/trainings/${training.value.id}`, {
+  const res = await apiFetch(`/api/trainings/${training.value.id}`, {
     method: 'PUT',
     body: JSON.stringify(t),
     credentials: 'include',

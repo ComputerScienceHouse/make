@@ -2,6 +2,7 @@
 import { ref, onMounted } from 'vue'
 import type { Area } from '@/models/areas'
 import { authState } from '@/auth'
+import { apiFetch } from '@/util/fetch'
 
 const user = authState.user
 const areas = ref<Area[]>([])
@@ -15,8 +16,8 @@ onMounted(async () => {
     loading.value = true
 
     const [areaRes, accessRes] = await Promise.all([
-      fetch('/api/areas'),
-      fetch(`/api/user/${user?.uuid}/areaAccess`),
+      apiFetch('/api/areas'),
+      apiFetch(`/api/user/${user?.uuid}/areaAccess`),
     ])
     areas.value = await areaRes.json()
     areasWithAccess.value = await accessRes.json()

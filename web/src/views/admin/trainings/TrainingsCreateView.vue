@@ -2,6 +2,7 @@
 import TrainingEditForm from '@/components/TrainingEditForm.vue'
 import type { TrainingFull } from '@/models/trainings'
 import router from '@/router'
+import { apiFetch } from '@/util/fetch'
 import { ref } from 'vue'
 
 const training = ref<TrainingFull>({
@@ -13,7 +14,7 @@ const training = ref<TrainingFull>({
 })
 
 async function saveTraining(t: TrainingFull) {
-  const res = await fetch(`/api/trainings/`, {
+  const res = await apiFetch(`/api/trainings/`, {
     method: 'POST',
     body: JSON.stringify(t),
     credentials: 'include',

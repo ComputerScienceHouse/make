@@ -11,6 +11,7 @@ import AddTrainingPopup from '@/components/AddTrainingPopup.vue'
 import LoadingScreen from '@/components/LoadingScreen.vue'
 import type { Resource } from '@/models/resources'
 import AddResourcePopup from '@/components/AddResourcePopup.vue'
+import { apiFetch } from '@/util/fetch'
 
 const area = ref<Area>()
 const trainings = ref<Training[]>()
@@ -36,7 +37,7 @@ const tableOptions: TableOptions<Training> = {
   actions: {
     delete: {
       handler: async (t) => {
-        await fetch(`/api/trainings/area/${area.value?.id}`, {
+        await apiFetch(`/api/trainings/area/${area.value?.id}`, {
           body: JSON.stringify({ id: t.id }),
           method: 'DELETE',
           credentials: 'include',
@@ -53,7 +54,7 @@ const resourcesTableOptions: TableOptions<Resource> = {
   actions: {
     delete: {
       handler: async (t) => {
-        await fetch(`/api/resources/area/${area.value?.id}`, {
+        await apiFetch(`/api/resources/area/${area.value?.id}`, {
           body: JSON.stringify({ id: t.id }),
           method: 'DELETE',
           credentials: 'include',
@@ -68,9 +69,9 @@ onMounted(async () => {
     loading.value = true
 
     const [areaRes, trainingRes, resourcesRes] = await Promise.all([
-      fetch(`/api/areas/${route.params.id}`),
-      fetch(`/api/trainings/area/${route.params.id}`),
-      fetch(`/api/resources/area/${route.params.id}`),
+      apiFetch(`/api/areas/${route.params.id}`),
+      apiFetch(`/api/trainings/area/${route.params.id}`),
+      apiFetch(`/api/resources/area/${route.params.id}`),
     ])
 
     if (areaRes.status === 404) {
@@ -92,7 +93,7 @@ onMounted(async () => {
 })
 
 async function saveArea(area: Area) {
-  const res = await fetch(`/api/areas/${area.id}`, {
+  const res = await apiFetch(`/api/areas/${area.id}`, {
     method: 'PUT',
     body: JSON.stringify(area),
     credentials: 'include',

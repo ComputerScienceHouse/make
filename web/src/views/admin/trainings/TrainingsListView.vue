@@ -4,6 +4,7 @@ import type { TableOptions } from '@/components/DynamicTable.vue'
 import { ref, onMounted } from 'vue'
 import type { Training } from '@/models/trainings'
 import LoadingScreen from '@/components/LoadingScreen.vue'
+import { apiFetch } from '@/util/fetch'
 
 const trainings = ref<Training[]>([])
 const loading = ref(true)
@@ -15,7 +16,7 @@ const tableOptions: TableOptions<Training> = {
     },
     delete: {
       handler: async (training: Training) => {
-        await fetch(`/api/trainings/${training.id}`, {
+        await apiFetch(`/api/trainings/${training.id}`, {
           method: 'DELETE',
           credentials: 'include',
         })
@@ -28,7 +29,7 @@ onMounted(async () => {
   try {
     loading.value = true
 
-    const trainingsRes = await fetch(`/api/trainings/`)
+    const trainingsRes = await apiFetch(`/api/trainings/`)
 
     if (!trainingsRes.ok) {
       throw new Error('Failed to fetch data')

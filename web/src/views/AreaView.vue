@@ -6,6 +6,7 @@ import type { Training, UserTraining } from '@/models/trainings'
 import type { Resource } from '@/models/resources'
 import { ref, onMounted, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import { apiFetch } from '@/util/fetch'
 
 const user = authState.user
 
@@ -57,10 +58,10 @@ onMounted(async () => {
     loading.value = true
 
     const [areaRes, trainingsRes, userTrainingsRes, resourcesRes] = await Promise.all([
-      fetch(`/api/areas/${route.params.id}`),
-      fetch(`/api/trainings/area/${route.params.id}`),
-      fetch(`/api/user/${user?.uuid}/trainings`),
-      fetch(`/api/resources/area/${route.params.id}`),
+      apiFetch(`/api/areas/${route.params.id}`),
+      apiFetch(`/api/trainings/area/${route.params.id}`),
+      apiFetch(`/api/user/${user?.uuid}/trainings`),
+      apiFetch(`/api/resources/area/${route.params.id}`),
     ])
 
     if (areaRes.status === 404) {
