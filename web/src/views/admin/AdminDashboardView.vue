@@ -70,7 +70,7 @@ const sections = [
           <h1>{{ section.title }}</h1>
           <div v-for="item in section.items" :key="item.title" class="col-md-6 col-lg-4 mt-2 mb-2">
             <RouterLink :to="item.path" class="text-decoration-none">
-              <div class="card h-100 shadow-sm">
+              <div class="card h-100 shadow-sm admin-card">
                 <div class="card-body">
                   <h3 class="card-title">
                     <i :class="`bi ${item.icon} me-2`"></i>
@@ -89,3 +89,9 @@ const sections = [
     </div>
   </main>
 </template>
+
+<style>
+.admin-card:hover {
+  border-color: var(--bs-primary) !important;
+}
+</style>
