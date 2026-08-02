@@ -39,13 +39,14 @@ function logout() {
               id="userDropdownLink"
               data-bs-toggle="dropdown"
               aria-expanded="false"
+              role="button"
             >
               <img
                 class="rounded-circle pfp me-2"
                 :src="'https://profiles.csh.rit.edu/image/' + user.preferred_username"
               />
-              <span class="light-hover me-1">{{ user.name }} </span>
-              <span class="caret light-hover"></span>
+              <span class="me-1">{{ user.name }} </span>
+              <span class="caret"></span>
             </a>
             <div class="dropdown-menu">
               <a class="dropdown-item" @click="logout()">Logout</a>
@@ -61,9 +62,5 @@ function logout() {
 .pfp {
   width: 2rem;
   height: 2rem;
-}
-
-.light-hover:hover {
-  color: white;
 }
 </style>
