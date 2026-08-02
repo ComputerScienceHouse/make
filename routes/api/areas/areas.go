@@ -129,6 +129,35 @@ func updateArea(c *gin.Context) {
 
 	c.Status(204)
 }
+
+// DeleteArea godoc
+//
+// @Summary Deletes an area
+// @Description Deletes an area
+// @Tags areas
+// @Accept json
+// @Param id path int true "Area ID"
+// @Success 204
+// @Failure 400 {object} models.ErrorResponse
+// @Failure 404 {object} models.ErrorResponse
+// @Failure 500 {object} models.ErrorResponse
+// @Router /areas/{id} [delete]
+func deleteArea(c *gin.Context) {
+	id, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		c.Error(err)
+		return
+	}
+
+	err = database.Helper.DeleteArea(id)
+	if err != nil {
+		c.Error(err)
+		return
+	}
+
+	c.Status(201)
+}
+
 func Routes(route *gin.RouterGroup) {
 	areas := route.Group("/areas")
 	areas.GET("/", getAllAreas)
@@ -136,4 +165,6 @@ func Routes(route *gin.RouterGroup) {
 
 	areas.PUT("/:id", middleware.RequireGroup("eboard"), updateArea)
 	areas.POST("/", middleware.RequireGroup("eboard"), createArea)
+
+	areas.DELETE("/:id", middleware.RequireGroup("eboard"), deleteArea)
 }

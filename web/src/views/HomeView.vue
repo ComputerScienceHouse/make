@@ -51,9 +51,9 @@ onMounted(async () => {
           </div>
         </div>
 
-        <div class="d-flex align-items-center justify-content-center pb-3 pb-sm-0 text-center pe-4">
+        <div class="d-flex align-items-center justify-content-center pb-3 pb-sm-0 text-center pe-md-4 mt-sm-2">
           <div>
-            <h6 class="mb-2 text-body-secondary">Access Status:</h6>
+            <h6 class="mb-2 text-body-secondary md:text-start">Access Status:</h6>
             <ul class="list-unstyled mb-0">
               <li v-for="area in areas" :key="area.id" class="d-flex align-items-center gap-2">
                 <i

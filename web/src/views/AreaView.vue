@@ -5,7 +5,7 @@ import type { Area } from '@/models/areas'
 import type { Training, UserTraining } from '@/models/trainings'
 import type { Resource } from '@/models/resources'
 import { ref, onMounted, computed } from 'vue'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 
 const user = authState.user
 
@@ -31,7 +31,26 @@ const progress = computed(() => {
   )
   return ((completedRequiredTrainings?.length || 0) / requiredTrainings.length) * 100
 })
+
 const route = useRoute()
+const router = useRouter()
+
+async function deleteArea() {
+  try {
+    const response = await fetch(`/api/areas/${area.value?.id}`, {
+      method: 'DELETE',
+      credentials: 'include',
+    })
+
+    if (!response.ok) {
+      throw new Error(`Failed to delete area (${response.status})`)
+    }
+  } catch (error) {
+    console.error('Error deleting area:', error)
+  }
+
+  router.push({ path: '/' })
+}
 
 onMounted(async () => {
   try {
@@ -76,13 +95,16 @@ onMounted(async () => {
       <div class="position-absolute top-0 start-0 w-100 h-100 image-gradient"></div>
 
       <!-- admin only button -->
-      <RouterLink
-        v-if="authState.isAdmin()"
-        :to="`/admin/areas/${area.id}`"
-        class="btn btn-primary position-absolute top-0 end-0 m-3 shadow-sm"
-      >
-        <i class="bi bi-pencil-square"></i>
-      </RouterLink>
+      <div v-if="authState.isAdmin()" class="position-absolute top-0 end-0 m-3 d-flex gap-2">
+        <RouterLink :to="`/admin/areas/${area.id}`" class="btn btn-primary shadow-sm">
+          <i class="bi bi-pencil-square"></i>
+        </RouterLink>
+
+        <button class="btn btn-primary shadow-sm" v-on:click="deleteArea">
+          <i class="bi bi-trash"></i>
+        </button>
+      </div>
+
 
       <div class="position-absolute bottom-0 start-0 p-4 text-white">
         <h1 class="mb-1">{{ area.name }}</h1>
@@ -99,10 +121,7 @@ onMounted(async () => {
             <div class="d-flex align-items-center justify-content-between mb-3">
               <h5 class="card-title mb-0">Your Status</h5>
 
-              <span
-                class="badge"
-                :class="completedAllTrainings ? 'text-bg-success' : 'text-bg-danger'"
-              >
+              <span class="badge" :class="completedAllTrainings ? 'text-bg-success' : 'text-bg-danger'">
                 {{ completedAllTrainings ? 'Certified' : 'Incomplete' }}
               </span>
             </div>
@@ -120,14 +139,8 @@ onMounted(async () => {
 
             <div class="mt-auto">
               <div class="progress" style="height: 6px">
-                <div
-                  class="progress-bar progress-bar-animated progress-bar-striped"
-                  role="progressbar"
-                  aria-valuenow="0"
-                  aria-valuemin="0"
-                  aria-valuemax="100"
-                  :style="{ width: progress + '%' }"
-                ></div>
+                <div class="progress-bar progress-bar-animated progress-bar-striped" role="progressbar"
+                  aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" :style="{ width: progress + '%' }"></div>
               </div>
             </div>
           </div>
@@ -140,25 +153,16 @@ onMounted(async () => {
             <h5 class="card-title mb-3">Required Trainings</h5>
 
             <ul class="list-group list-group-flush">
-              <li
-                v-if="trainings?.length === 0"
-                class="list-group-item d-flex justify-content-between text-muted"
-              >
+              <li v-if="trainings?.length === 0" class="list-group-item d-flex justify-content-between text-muted">
                 No trainings associated with area
               </li>
-              <li
-                v-for="training in trainings"
-                :key="training.id"
-                class="list-group-item d-flex justify-content-between"
-              >
+              <li v-for="training in trainings" :key="training.id"
+                class="list-group-item d-flex justify-content-between">
                 <RouterLink :to="`/training/${training.id}`" class="training-link">
                   {{ training.title }}
                 </RouterLink>
 
-                <span
-                  v-if="userTrainings?.some((t) => t.trainingId === training.id)"
-                  class="badge text-bg-success"
-                >
+                <span v-if="userTrainings?.some((t) => t.trainingId === training.id)" class="badge text-bg-success">
                   Completed
                 </span>
                 <span v-else class="badge text-bg-warning"> Required </span>
@@ -194,13 +198,11 @@ onMounted(async () => {
 
 <style scoped>
 .image-gradient {
-  background: linear-gradient(
-    to top,
-    rgba(0, 0, 0, 0.8) 0%,
-    rgba(0, 0, 0, 0.4) 40%,
-    rgba(0, 0, 0, 0.1) 70%,
-    rgba(0, 0, 0, 0) 100%
-  );
+  background: linear-gradient(to top,
+      rgba(0, 0, 0, 0.8) 0%,
+      rgba(0, 0, 0, 0.4) 40%,
+      rgba(0, 0, 0, 0.1) 70%,
+      rgba(0, 0, 0, 0) 100%);
 }
 
 .training-link {

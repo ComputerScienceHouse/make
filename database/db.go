@@ -66,6 +66,19 @@ func (database *DatabaseHelper) GetArea(areaID int) (models.Area, error) {
 	return area, nil
 }
 
+func (database *DatabaseHelper) DeleteArea(areaID int) error {
+	_, err := database.DB.Exec(
+		"DELETE FROM areas WHERE id = $1",
+		areaID,
+	)
+
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func (database *DatabaseHelper) GetAllAreas() ([]models.Area, error) {
 	rows, err := database.DB.Query("SELECT id, name, description, ldapgroup, photourl FROM areas")
 	if err != nil {
