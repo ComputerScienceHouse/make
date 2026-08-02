@@ -128,14 +128,14 @@ onMounted(async () => {
             </div>
 
             <p class="mb-1 fw-semibold">
-              {{ completedAllTrainings ? 'All training complete' : 'Training required' }}
+              {{ completedAllTrainings ? 'All trainings complete' : 'Trainings required' }}
             </p>
 
             <small v-if="completedAllTrainings" class="text-body-secondary mb-3">
-              You have completed all the bs
+              You have completed all required trainings
             </small>
             <small v-else class="text-body-secondary mb-3">
-              Complete all required training to gain access {{ area.name }}
+              Complete all required trainings to gain access to {{ area.name }}
             </small>
 
             <div class="mt-auto">
