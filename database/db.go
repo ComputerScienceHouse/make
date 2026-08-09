@@ -148,7 +148,7 @@ func (database *DatabaseHelper) GetTraining(trainingID int, includeAnswers bool)
 	var currentQuestion *models.Question
 	lastQuestionId := 0
 
-	query := "SELECT id, title, required_correct, description FROM trainings WHERE id = $1"
+	query := "SELECT id, title, required_correct, description, show_answers FROM trainings WHERE id = $1"
 
 	row := database.DB.QueryRow(query, trainingID)
 
@@ -157,6 +157,7 @@ func (database *DatabaseHelper) GetTraining(trainingID int, includeAnswers bool)
 		&training.Title,
 		&training.RequiredCorrect,
 		&training.Description,
+		&training.ShowAnswers,
 	)
 	if err != nil {
 		return models.Training{}, err
@@ -246,10 +247,11 @@ func (database *DatabaseHelper) CreateTraining(training models.CreateTrainingReq
 
 	var trainingId int
 	err = tx.QueryRow(
-		"INSERT INTO trainings (title, required_correct, description) VALUES ($1, $2, $3) RETURNING id",
+		"INSERT INTO trainings (title, required_correct, description, showAnswers) VALUES ($1, $2, $3, $4) RETURNING id",
 		training.Title,
 		training.RequiredCorrect,
 		training.Description,
+		training.ShowAnswers,
 	).Scan(&trainingId)
 
 	if err != nil {
@@ -299,10 +301,11 @@ func (database *DatabaseHelper) UpdateTraining(training models.CreateTrainingReq
 	defer tx.Rollback()
 
 	_, err = tx.Exec(
-		"UPDATE trainings SET title = $1, required_correct = $2, description = $3 WHERE id = $4",
+		"UPDATE trainings SET title = $1, required_correct = $2, description = $3, show_answers = $4 WHERE id = $5",
 		training.Title,
 		training.RequiredCorrect,
 		training.Description,
+		training.ShowAnswers,
 		trainingId,
 	)
 

@@ -1,0 +1,1 @@
+ALTER TABLE trainings ADD show_answers BOOLEAN NOT NULL DEFAULT FALSE;

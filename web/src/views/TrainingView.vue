@@ -2,6 +2,7 @@
 import { authState } from '@/auth'
 import LoadingScreen from '@/components/LoadingScreen.vue'
 import type { SubmissionResults, Training, UserTraining } from '@/models/trainings'
+import { apiFetch } from '@/util/fetch'
 import { ref, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 
@@ -24,8 +25,8 @@ onMounted(async () => {
     loading.value = true
 
     const [trainingRes, userTrainingsRes] = await Promise.all([
-      fetch(`/api/trainings/${route.params.id}`),
-      fetch(`/api/user/${user?.uuid}/trainings`),
+      apiFetch(`/api/trainings/${route.params.id}`),
+      apiFetch(`/api/user/${user?.uuid}/trainings`),
     ])
 
     if (trainingRes.status === 404) {
@@ -56,7 +57,7 @@ async function submitTraining() {
     payload[key] = String(value)
   }
 
-  const res = await fetch(`/api/trainings/${training.value?.id}/submissions`, {
+  const res = await apiFetch(`/api/trainings/${training.value?.id}/submissions`, {
     method: 'POST',
     body: JSON.stringify(payload),
     credentials: 'include',
@@ -69,6 +70,12 @@ async function submitTraining() {
   submitted.value = true
   loading.value = false
   submissionResults.value = await res.json()
+}
+
+function formatAnswer(answer: string | number | boolean | undefined) {
+  if (answer === true) return 'Yes'
+  if (answer === false) return 'No'
+  return answer ?? 'No answer'
 }
 </script>
 
@@ -213,6 +220,50 @@ async function submitTraining() {
 
       <RouterLink class="btn btn-primary" to="/"> Return Home </RouterLink>
     </div>
+
+    <div class="mt-5" v-if="training?.showAnswers">
+      <h2 class="h4 mb-3">Review</h2>
+
+      <div
+        v-for="(question, index) in training?.questions"
+        :key="question.id"
+        class="card mb-3 question-review-card shadow-sm"
+        :class="
+          submissionResults.gradedResponse[question.id] ? 'question-correct' : 'question-incorrect'
+        "
+      >
+        <div class="card-body">
+          <div class="d-flex align-items-start gap-3">
+            <div class="pt-1">
+              <i
+                class="bi"
+                :class="
+                  submissionResults.gradedResponse[question.id]
+                    ? 'bi-check-circle-fill text-success'
+                    : 'bi-x-circle-fill text-danger'
+                "
+              ></i>
+            </div>
+
+            <div class="flex-grow-1">
+              <div class="text-body-secondary small mb-1">Question {{ index + 1 }}</div>
+
+              <div class="fw-semibold mb-3">
+                {{ question.label }}
+              </div>
+
+              <div>
+                <div class="text-body-secondary small mb-1">Your answer</div>
+
+                <div>
+                  {{ formatAnswer(answers[question.id]) }}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   </main>
 
   <main class="container py-4" v-else-if="notFound">
@@ -235,5 +286,17 @@ async function submitTraining() {
   cursor: pointer;
 
   border: 1px solid var(--bs-secondary);
+}
+
+.question-review-card {
+  border-left-width: 4px;
+}
+
+.question-correct {
+  border-left-color: var(--bs-success);
+}
+
+.question-incorrect {
+  border-left-color: var(--bs-danger);
 }
 </style>

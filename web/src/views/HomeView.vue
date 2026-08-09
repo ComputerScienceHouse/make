@@ -52,7 +52,9 @@ onMounted(async () => {
           </div>
         </div>
 
-        <div class="d-flex align-items-center justify-content-center pb-3 pb-sm-0 text-center pe-md-4 mt-sm-2">
+        <div
+          class="d-flex align-items-center justify-content-center pb-3 pb-sm-0 text-center pe-md-4 mt-sm-2"
+        >
           <div>
             <h6 class="mb-2 text-body-secondary md:text-start">Access Status:</h6>
             <ul class="list-unstyled mb-0">
