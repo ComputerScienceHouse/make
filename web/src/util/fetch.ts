@@ -28,7 +28,6 @@ export async function apiFetch(
     return response
   }
 
-  console.log("refresh")
 
   const refreshed = await refreshAuth()
 
