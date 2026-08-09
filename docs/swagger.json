@@ -1084,6 +1084,9 @@
                 "requiredCorrect": {
                     "type": "integer"
                 },
+                "showAnswers": {
+                    "type": "boolean"
+                },
                 "title": {
                     "type": "string"
                 }
@@ -1161,6 +1164,9 @@
                 },
                 "requiredCorrect": {
                     "type": "integer"
+                },
+                "showAnswers": {
+                    "type": "boolean"
                 },
                 "title": {
                     "type": "string"

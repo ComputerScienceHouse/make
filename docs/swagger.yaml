@@ -58,6 +58,8 @@ definitions:
         type: array
       requiredCorrect:
         type: integer
+      showAnswers:
+        type: boolean
       title:
         type: string
     type: object
@@ -109,6 +111,8 @@ definitions:
         type: array
       requiredCorrect:
         type: integer
+      showAnswers:
+        type: boolean
       title:
         type: string
     type: object

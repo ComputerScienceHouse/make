@@ -1092,6 +1092,9 @@ const docTemplate = `{
                 "requiredCorrect": {
                     "type": "integer"
                 },
+                "showAnswers": {
+                    "type": "boolean"
+                },
                 "title": {
                     "type": "string"
                 }
@@ -1169,6 +1172,9 @@ const docTemplate = `{
                 },
                 "requiredCorrect": {
                     "type": "integer"
+                },
+                "showAnswers": {
+                    "type": "boolean"
                 },
                 "title": {
                     "type": "string"
