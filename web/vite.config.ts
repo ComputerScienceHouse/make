@@ -3,9 +3,7 @@ import { fileURLToPath, URL } from 'node:url'
 import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import vueDevTools from 'vite-plugin-vue-devtools'
-import gitDescribe from 'git-describe'
 
-const gitInfo = gitDescribe.gitDescribeSync()
 
 // https://vite.dev/config/
 export default defineConfig({
@@ -27,6 +25,6 @@ export default defineConfig({
     },
   },
   define: {
-    git_describe: JSON.stringify(gitInfo.raw),
+    git_describe: JSON.stringify(process.env.GIT_DESCRIBE || 'unknown'),
   }
 })

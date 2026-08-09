@@ -10,7 +10,9 @@ COPY .git .
 RUN npm ci
 
 COPY web/ .
-RUN npm run build
+
+RUN GIT_DESCRIBE="$(git describe --always --dirty --tags 2>/dev/null || echo unknown)" \
+    npm run build
 
 
 # go builder
