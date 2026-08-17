@@ -57,6 +57,21 @@ const router = createRouter({
       meta: { requiresAdmin: true },
     },
     {
+      path: '/admin/resources/',
+      component: () => import('@/views/admin/resources/ResourceListView.vue'),
+      meta: { requiresAdmin: true },
+    },
+    {
+      path: '/admin/resources/:id',
+      component: () => import('@/views/admin/resources/ResourceEditView.vue'),
+      meta: { requiresAdmin: true },
+    },
+    {
+      path: '/admin/resources/create',
+      component: () => import('@/views/admin/resources/ResourceCreateView.vue'),
+      meta: { requiresAdmin: true },
+    },
+    {
       path: '/:pathMatch(.*)*',
       component: () => import('@/views/NotFoundView.vue'),
     },

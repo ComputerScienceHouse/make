@@ -18,6 +18,7 @@ type Training struct {
 	Title           string     `json:"title"`
 	Description     string     `json:"description"`
 	RequiredCorrect int        `json:"requiredCorrect"`
+	ShowAnswers     bool       `json:"showAnswers"`
 	Questions       []Question `json:"questions"`
 }
 
@@ -25,6 +26,7 @@ type CreateTrainingRequest struct {
 	Title           string     `json:"title"`
 	Description     string     `json:"description"`
 	RequiredCorrect int        `json:"requiredCorrect"`
+	ShowAnswers     bool       `json:"showAnswers"`
 	Questions       []Question `json:"questions"`
 }
 
@@ -38,8 +40,9 @@ type UserTraining struct {
 type Submission = map[int]string
 
 type SubmissionResponse struct {
-	Passed       bool `json:"passed"`
-	NumCorrect   int  `json:"numCorrect"`
-	NumIncorrect int  `json:"numIncorrect"`
-	Grade        int  `json:"grade"`
+	Passed         bool         `json:"passed"`
+	NumCorrect     int          `json:"numCorrect"`
+	NumIncorrect   int          `json:"numIncorrect"`
+	Grade          int          `json:"grade"`
+	GradedResponse map[int]bool `json:"gradedResponse"`
 }

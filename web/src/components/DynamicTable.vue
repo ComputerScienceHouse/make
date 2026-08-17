@@ -76,17 +76,26 @@ async function deleteRow(row: T) {
     <table class="table table-striped table-hover align-middle">
       <thead class="table-dark">
         <tr>
+          <th v-if="options.actions?.checkbox"></th>
           <th v-for="col in cols" :key="col" class="text-nowrap">
             {{ col }}
           </th>
           <th v-if="options.actions?.edit"></th>
           <th v-if="options.actions?.delete"></th>
-          <th v-if="options.actions?.checkbox"></th>
         </tr>
       </thead>
 
       <tbody>
         <tr v-for="(row, i) in data" :key="i">
+          <td v-if="options.actions?.checkbox">
+            <input
+              type="checkbox"
+              :checked="selectedRows.includes(row)"
+              class="form-check-input"
+              @change="toggleRow(row, ($event.target as HTMLInputElement).checked)"
+            />
+          </td>
+
           <td v-for="col in cols" :key="col" class="text-truncate" style="max-width: 200px">
             {{ row[col] }}
           </td>
@@ -107,15 +116,6 @@ async function deleteRow(row: T) {
                 <i class="bi bi-trash"></i>
               </button>
             </div>
-          </td>
-
-          <td v-if="options.actions?.checkbox">
-            <input
-              type="checkbox"
-              :checked="selectedRows.includes(row)"
-              class="form-check-input"
-              @change="toggleRow(row, ($event.target as HTMLInputElement).checked)"
-            />
           </td>
         </tr>
       </tbody>

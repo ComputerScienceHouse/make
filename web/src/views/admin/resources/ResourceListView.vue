@@ -2,21 +2,24 @@
 import DynamicTable from '@/components/DynamicTable.vue'
 import type { TableOptions } from '@/components/DynamicTable.vue'
 import { ref, onMounted } from 'vue'
-import type { Training } from '@/models/trainings'
 import LoadingScreen from '@/components/LoadingScreen.vue'
+import type { Resource } from '@/models/resources'
 import { apiFetch } from '@/util/fetch'
 
-const trainings = ref<Training[]>([])
+const resources = ref<Resource[]>([])
 const loading = ref(true)
+const notFound = ref(false)
 
-const tableOptions: TableOptions<Training> = {
+const tableOptions: TableOptions<Resource> = {
   actions: {
     edit: {
-      path: (training: Training) => `/admin/trainings/${training.id}`,
+      // relative path, will redirect to
+      // /admin/areas/id
+      path: (Resource: Resource) => `/admin/resources/${Resource.id}`,
     },
     delete: {
-      handler: async (training: Training) => {
-        await apiFetch(`/api/trainings/${training.id}`, {
+      handler: async (resource: Resource) => {
+        await apiFetch(`/api/resources/${resource.id}`, {
           method: 'DELETE',
           credentials: 'include',
         })
@@ -29,13 +32,17 @@ onMounted(async () => {
   try {
     loading.value = true
 
-    const trainingsRes = await apiFetch(`/api/trainings/`)
+    const resourceRes = await apiFetch(`/api/resources/`)
 
-    if (!trainingsRes.ok) {
+    if (resourceRes.status === 404) {
+      notFound.value = true
+    }
+
+    if (!resourceRes.ok) {
       throw new Error('Failed to fetch data')
     }
 
-    trainings.value = await trainingsRes.json()
+    resources.value = await resourceRes.json()
   } catch (err) {
     console.error(err)
   } finally {
@@ -51,11 +58,11 @@ onMounted(async () => {
 
   <main class="container" v-else>
     <div class="d-flex justify-content-between align-items-center">
-      <h1>Trainings:</h1>
-      <RouterLink to="/admin/trainings/create" class="btn btn-primary">Create</RouterLink>
+      <h1>Resources:</h1>
+      <RouterLink to="/admin/areas/create" type="button" class="btn btn-primary">Create</RouterLink>
     </div>
 
-    <DynamicTable :data="trainings" :options="tableOptions"></DynamicTable>
+    <DynamicTable :data="resources" :options="tableOptions"></DynamicTable>
   </main>
 </template>
 

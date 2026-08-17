@@ -17,6 +17,8 @@ definitions:
     type: object
   ldap.UserWUUID:
     properties:
+      name:
+        type: string
       username:
         type: string
       uuid:
@@ -54,6 +56,10 @@ definitions:
         items:
           $ref: '#/definitions/models.Question'
         type: array
+      requiredCorrect:
+        type: integer
+      showAnswers:
+        type: boolean
       title:
         type: string
     type: object
@@ -78,6 +84,21 @@ definitions:
       type:
         type: string
     type: object
+  models.Resource:
+    properties:
+      description:
+        type: string
+      id:
+        type: integer
+      name:
+        type: string
+      url:
+        type: string
+    type: object
+  models.Submission:
+    additionalProperties:
+      type: string
+    type: object
   models.Training:
     properties:
       description:
@@ -88,8 +109,17 @@ definitions:
         items:
           $ref: '#/definitions/models.Question'
         type: array
+      requiredCorrect:
+        type: integer
+      showAnswers:
+        type: boolean
       title:
         type: string
+    type: object
+  resources.RemoveResourceRequest:
+    properties:
+      id:
+        type: integer
     type: object
   trainings.RemoveTrainingRequest:
     properties:
@@ -146,6 +176,34 @@ paths:
       tags:
       - areas
   /areas/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Deletes an area
+      parameters:
+      - description: Area ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      responses:
+        "204":
+          description: No Content
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: Deletes an area
+      tags:
+      - areas
     get:
       description: Returns an area by ID
       parameters:
@@ -242,6 +300,222 @@ paths:
       summary: Get active CSH members
       tags:
       - members
+  /resources:
+    get:
+      description: Returns all resources
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Resource'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: Get all resources
+      tags:
+      - resources
+    post:
+      consumes:
+      - application/json
+      description: Creates a new resource
+      parameters:
+      - description: Resource
+        in: body
+        name: resource
+        required: true
+        schema:
+          $ref: '#/definitions/models.Resource'
+      responses:
+        "201":
+          description: Created
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: Create resource
+      tags:
+      - resources
+  /resources/{id}:
+    delete:
+      description: Deletes a resource by ID
+      parameters:
+      - description: Resource ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      responses:
+        "204":
+          description: No Content
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: Delete resource
+      tags:
+      - resources
+    get:
+      description: Returns a resource by ID
+      parameters:
+      - description: Resource ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Resource'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: Get resource
+      tags:
+      - resources
+    put:
+      consumes:
+      - application/json
+      description: Updates an existing resource
+      parameters:
+      - description: Resource ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Resource
+        in: body
+        name: resource
+        required: true
+        schema:
+          $ref: '#/definitions/models.Resource'
+      responses:
+        "201":
+          description: Created
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: Update resource
+      tags:
+      - resources
+  /resources/area/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Removes a resource from an area
+      parameters:
+      - description: Area ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Resource removal request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/resources.RemoveResourceRequest'
+      responses:
+        "201":
+          description: Created
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: Remove resource from area
+      tags:
+      - resources
+    get:
+      description: Returns all resources associated with an area
+      parameters:
+      - description: Area ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Resource'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: Get area resources
+      tags:
+      - resources
+    post:
+      consumes:
+      - application/json
+      description: Adds resources to an area
+      parameters:
+      - description: Area ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Resource IDs
+        in: body
+        name: request
+        required: true
+        schema:
+          items:
+            type: integer
+          type: array
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: Add resources to area
+      tags:
+      - resources
   /trainings:
     get:
       description: Returns all trainings
@@ -259,6 +533,31 @@ paths:
           schema:
             $ref: '#/definitions/models.ErrorResponse'
       summary: Get all trainings
+      tags:
+      - trainings
+    post:
+      consumes:
+      - application/json
+      description: Create a new training
+      parameters:
+      - description: Training
+        in: body
+        name: training
+        required: true
+        schema:
+          $ref: '#/definitions/models.CreateTrainingRequest'
+      responses:
+        "201":
+          description: Created
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: Create training
       tags:
       - trainings
   /trainings/{id}:
@@ -367,6 +666,32 @@ paths:
       summary: Get training
       tags:
       - trainings
+  /trainings/{id}/submissions:
+    post:
+      consumes:
+      - application/json
+      description: Submits and grades a completed training
+      parameters:
+      - description: Training
+        in: body
+        name: training
+        required: true
+        schema:
+          $ref: '#/definitions/models.Submission'
+      responses:
+        "201":
+          description: Created
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: Submits and grades a completed training
+      tags:
+      - trainings
   /trainings/area/{id}:
     delete:
       consumes:
@@ -456,32 +781,6 @@ paths:
           schema:
             $ref: '#/definitions/models.ErrorResponse'
       summary: Add trainings to area
-      tags:
-      - trainings
-  /trainings/create:
-    post:
-      consumes:
-      - application/json
-      description: Create a new training
-      parameters:
-      - description: Training
-        in: body
-        name: training
-        required: true
-        schema:
-          $ref: '#/definitions/models.CreateTrainingRequest'
-      responses:
-        "201":
-          description: Created
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/models.ErrorResponse'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/models.ErrorResponse'
-      summary: Create training
       tags:
       - trainings
 swagger: "2.0"

@@ -3,14 +3,17 @@ import { authState } from '@/auth'
 import LoadingScreen from '@/components/LoadingScreen.vue'
 import type { Area } from '@/models/areas'
 import type { Training, UserTraining } from '@/models/trainings'
+import type { Resource } from '@/models/resources'
 import { ref, onMounted, computed } from 'vue'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
+import { apiFetch } from '@/util/fetch'
 
 const user = authState.user
 
 const area = ref<Area | null>(null)
 const trainings = ref<Training[] | null>(null)
 const userTrainings = ref<UserTraining[] | null>(null)
+const resources = ref<Resource[] | null>(null)
 const loading = ref(true)
 const notFound = ref(false)
 
@@ -29,29 +32,50 @@ const progress = computed(() => {
   )
   return ((completedRequiredTrainings?.length || 0) / requiredTrainings.length) * 100
 })
+
 const route = useRoute()
+const router = useRouter()
+
+async function deleteArea() {
+  try {
+    const response = await fetch(`/api/areas/${area.value?.id}`, {
+      method: 'DELETE',
+      credentials: 'include',
+    })
+
+    if (!response.ok) {
+      throw new Error(`Failed to delete area (${response.status})`)
+    }
+  } catch (error) {
+    console.error('Error deleting area:', error)
+  }
+
+  router.push({ path: '/' })
+}
 
 onMounted(async () => {
   try {
     loading.value = true
 
-    const [areaRes, trainingsRes, userTrainingsRes] = await Promise.all([
-      fetch(`/api/areas/${route.params.id}`),
-      fetch(`/api/trainings/area/${route.params.id}`),
-      fetch(`/api/user/${user?.uuid}/trainings`),
+    const [areaRes, trainingsRes, userTrainingsRes, resourcesRes] = await Promise.all([
+      apiFetch(`/api/areas/${route.params.id}`),
+      apiFetch(`/api/trainings/area/${route.params.id}`),
+      apiFetch(`/api/user/${user?.uuid}/trainings`),
+      apiFetch(`/api/resources/area/${route.params.id}`),
     ])
 
     if (areaRes.status === 404) {
       notFound.value = true
     }
 
-    if (!areaRes.ok || !trainingsRes.ok || !userTrainingsRes.ok) {
+    if (!areaRes.ok || !trainingsRes.ok || !userTrainingsRes.ok || !resourcesRes.ok) {
       throw new Error('Failed to fetch data')
     }
 
     area.value = await areaRes.json()
     trainings.value = await trainingsRes.json()
     userTrainings.value = await userTrainingsRes.json()
+    resources.value = await resourcesRes.json()
   } catch (err) {
     console.error(err)
   } finally {
@@ -72,13 +96,15 @@ onMounted(async () => {
       <div class="position-absolute top-0 start-0 w-100 h-100 image-gradient"></div>
 
       <!-- admin only button -->
-      <RouterLink
-        v-if="authState.isAdmin()"
-        :to="`/admin/areas/${area.id}`"
-        class="btn btn-primary position-absolute top-0 end-0 m-3 shadow-sm"
-      >
-        <i class="bi bi-pencil-square"></i>
-      </RouterLink>
+      <div v-if="authState.isAdmin()" class="position-absolute top-0 end-0 m-3 d-flex gap-2">
+        <RouterLink :to="`/admin/areas/${area.id}`" class="btn btn-primary shadow-sm">
+          <i class="bi bi-pencil-square"></i>
+        </RouterLink>
+
+        <button class="btn btn-primary shadow-sm" v-on:click="deleteArea">
+          <i class="bi bi-trash"></i>
+        </button>
+      </div>
 
       <div class="position-absolute bottom-0 start-0 p-4 text-white">
         <h1 class="mb-1">{{ area.name }}</h1>
@@ -104,14 +130,14 @@ onMounted(async () => {
             </div>
 
             <p class="mb-1 fw-semibold">
-              {{ completedAllTrainings ? 'All training complete' : 'Training required' }}
+              {{ completedAllTrainings ? 'All trainings complete' : 'Trainings required' }}
             </p>
 
             <small v-if="completedAllTrainings" class="text-body-secondary mb-3">
-              You have completed all the bs
+              You have completed all required trainings
             </small>
             <small v-else class="text-body-secondary mb-3">
-              Complete all required training to gain access {{ area.name }}
+              Complete all required trainings to gain access to {{ area.name }}
             </small>
 
             <div class="mt-auto">
@@ -165,14 +191,13 @@ onMounted(async () => {
       </div>
     </div>
 
-    <div class="card mt-4">
+    <div class="card mt-4" v-if="resources && resources.length > 0">
       <div class="card-body">
         <h5 class="card-title">Resources</h5>
-
         <div class="d-flex gap-2 flex-wrap">
-          <button class="btn btn-outline-primary btn-sm">Safety Rules</button>
-
-          <button class="btn btn-outline-primary btn-sm">Equipment Guide</button>
+          <a v-for="r in resources" :href="r.url" :key="r.id" target="_blank">
+            <button class="btn btn-outline-primary btn-sm">{{ r.name }}</button>
+          </a>
         </div>
       </div>
     </div>

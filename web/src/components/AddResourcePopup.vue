@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import type { Training } from '@/models/trainings'
 import { onMounted, ref } from 'vue'
 import DynamicTable from './DynamicTable.vue'
 import type { TableOptions } from './DynamicTable.vue'
+import type { Resource } from '@/models/resources.ts'
 
 const emit = defineEmits<{
   close: []
@@ -17,47 +17,44 @@ interface Props {
 }
 const props = defineProps<Props>()
 
-const tableOptions: TableOptions<Training> = {
-  fields: {
-    questions: { hidden: true },
-  },
+const tableOptions: TableOptions<Resource> = {
   actions: {
     checkbox: true,
   },
 }
 
 const loading = ref(true)
-const trainings = ref<Training[]>()
+const resources = ref<Resource[]>()
 const error = ref<string>()
 
 // From table
-const selectedTrainings = ref<Training[]>([])
+const selectedResources = ref<Resource[]>([])
 
 onMounted(async () => {
   try {
     loading.value = true
 
-    const trainingRes = await fetch(`/api/trainings/`, {
+    const resourceRes = await fetch(`/api/resources/`, {
       credentials: 'include',
     })
 
-    if (!trainingRes.ok) {
+    if (!resourceRes.ok) {
       throw new Error('Failed to fetch data')
     }
 
-    trainings.value = await trainingRes.json()
+    resources.value = await resourceRes.json()
   } catch (err) {
     console.error(err)
-    error.value = `Error while fetching trainings`
+    error.value = `Error while fetching resources`
   } finally {
     loading.value = false
   }
 })
 
 async function save() {
-  const res = await fetch(`/api/trainings/area/${props.areaid}`, {
+  const res = await fetch(`/api/resources/area/${props.areaid}`, {
     method: 'POST',
-    body: JSON.stringify(selectedTrainings.value.map((s) => s.id)),
+    body: JSON.stringify(selectedResources.value.map((s) => s.id)),
     credentials: 'include',
   })
 
@@ -77,17 +74,17 @@ async function save() {
     <div class="modal-dialog modal-dialog-centered">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title">Add Training</h5>
+          <h5 class="modal-title">Add Resource</h5>
           <button type="button" class="btn-close" aria-label="Close" v-on:click="close"></button>
         </div>
         <div class="modal-body">
-          <p>Select trainings you wish to add</p>
+          <p>Select resources you wish to add</p>
           <div v-if="loading">Loading....</div>
-          <div v-else-if="trainings">
+          <div v-else-if="resources">
             <DynamicTable
-              :data="trainings"
+              :data="resources"
               :options="tableOptions"
-              v-model="selectedTrainings"
+              v-model="selectedResources"
             ></DynamicTable>
           </div>
           <p v-if="error" class="text-danger">{{ error }}</p>

@@ -1,28 +1,26 @@
 <script setup lang="ts">
-import type { Area } from '@/models/areas'
 import { ref } from 'vue'
 import DynamicForm, { type FormOptions } from '@/components/DynamicForm.vue'
-import router from '@/router'
+import type { Resource } from '@/models/resources'
 import { apiFetch } from '@/util/fetch'
 
-const area = ref<Area>({
+const resource = ref<Resource>({
   id: 0, // id is ignored by api when creating a new area
   name: '',
   description: '',
-  ldapGroup: '',
-  photourl: '',
+  url: '',
 })
 
-const formOptions: FormOptions<Area> = {
+const formOptions: FormOptions<Resource> = {
   fields: {
     id: { hidden: true },
   },
 }
 
-async function saveArea(area: Area) {
-  const res = await apiFetch(`/api/areas/`, {
+async function saveResource(resource: Resource) {
+  const res = await apiFetch(`/api/resources/`, {
     method: 'POST',
-    body: JSON.stringify(area),
+    body: JSON.stringify(resource),
     credentials: 'include',
   })
 
@@ -30,19 +28,24 @@ async function saveArea(area: Area) {
     throw new Error(`Failed to save area: ${res.status}`)
   }
 
-  router.push({ path: `/` })
+  location.reload()
 
   return
 }
 </script>
 
 <template>
-  <main class="container" v-if="area">
+  <main class="container" v-if="resource">
     <div class="d-flex justify-content-between align-items-center">
-      <h1>Creating New Area</h1>
+      <h1>Creating New Resource</h1>
     </div>
 
-    <DynamicForm :data="area" :options="formOptions" @submit="saveArea" class="mb-3"></DynamicForm>
+    <DynamicForm
+      :data="resource"
+      :options="formOptions"
+      @submit="saveResource"
+      class="mb-3"
+    ></DynamicForm>
   </main>
 </template>
 

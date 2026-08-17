@@ -2,6 +2,7 @@
 import LoadingScreen from '@/components/LoadingScreen.vue'
 import TrainingEditForm from '@/components/TrainingEditForm.vue'
 import type { TrainingFull } from '@/models/trainings'
+import { apiFetch } from '@/util/fetch'
 import { onMounted, ref } from 'vue'
 import { useRoute } from 'vue-router'
 
@@ -12,6 +13,7 @@ const training = ref<TrainingFull>({
   title: 'New Training',
   description: 'Gets to creating!',
   requiredCorrect: 0,
+  showAnswers: false,
   questions: [],
 })
 const route = useRoute()
@@ -20,7 +22,7 @@ onMounted(async () => {
   try {
     loading.value = true
 
-    const trainingRes = await fetch(`/api/trainings/${route.params.id}/full`)
+    const trainingRes = await apiFetch(`/api/trainings/${route.params.id}/full`)
 
     if (trainingRes.status === 404) {
       notFound.value = true
@@ -39,7 +41,7 @@ onMounted(async () => {
 })
 
 async function saveTraining(t: TrainingFull) {
-  const res = await fetch(`/api/trainings/${training.value.id}`, {
+  const res = await apiFetch(`/api/trainings/${training.value.id}`, {
     method: 'PUT',
     body: JSON.stringify(t),
     credentials: 'include',
@@ -65,16 +67,27 @@ async function saveTraining(t: TrainingFull) {
       <div class="flex-grow-1 me-3">
         <input type="text" v-model="training.title" class="h1 underline-input w-100" />
         <input type="text" v-model="training.description" class="p underline-input text-muted" />
-        <div class="mt-2">
-          <label class="form-label small">Required Correct Answers</label>
-          <input
-            type="number"
-            min="0"
-            :max="training.questions.length"
-            v-model.number="training.requiredCorrect"
-            class="form-control"
-            style="max-width: 100px"
-          />
+        <div class="d-flex mt-2 align-items-center">
+          <div class="me-4">
+            <label class="form-label small">Required Correct Answers</label>
+            <input
+              type="number"
+              min="0"
+              :max="training.questions.length"
+              v-model.number="training.requiredCorrect"
+              class="form-control"
+              style="max-width: 100px"
+            />
+          </div>
+          <div class="form-check form-switch">
+            <input
+              type="checkbox"
+              id="required"
+              class="form-check-input"
+              v-model="training.showAnswers"
+            />
+            <label class="form-check-label small ms-1">Show answers upon completion </label>
+          </div>
         </div>
       </div>
       <div class="text-end flex-shrink-0">

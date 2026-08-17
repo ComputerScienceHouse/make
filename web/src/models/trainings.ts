@@ -44,6 +44,7 @@ export interface Training {
   title: string
   description: string
   requiredCorrect: number
+  showAnswers: boolean
   questions: Question[]
 }
 
@@ -52,6 +53,7 @@ export interface TrainingFull {
   title: string
   description: string
   requiredCorrect: number
+  showAnswers: boolean
   questions: QuestionWithAnswer[]
 }
 
@@ -67,4 +69,5 @@ export interface SubmissionResults {
   numCorrect: number
   numIncorrect: number
   grade: number
+  gradedResponse: Record<string, boolean>
 }

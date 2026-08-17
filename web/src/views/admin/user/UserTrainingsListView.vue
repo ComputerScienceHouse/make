@@ -9,6 +9,7 @@ import type { Member } from '@/models/member'
 import { ref, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import LoadingScreen from '@/components/LoadingScreen.vue'
+import { apiFetch } from '@/util/fetch'
 
 const members = ref<Member[]>([])
 const selectedMember = ref<Member>()
@@ -66,7 +67,7 @@ async function loadTrainings() {
   try {
     trainingsLoading.value = true
 
-    const trainingsRes = await fetch(`/api/user/${member.uuid}/trainings`, {
+    const trainingsRes = await apiFetch(`/api/user/${member.uuid}/trainings`, {
       credentials: 'include',
     })
 
@@ -86,7 +87,7 @@ onMounted(async () => {
   try {
     loading.value = true
 
-    const membersRes = await fetch('/api/members/active', {
+    const membersRes = await apiFetch('/api/members/active', {
       credentials: 'include',
     })
 

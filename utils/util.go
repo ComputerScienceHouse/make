@@ -51,6 +51,11 @@ func GradeTraining(trainingId int, userUUID string, submission models.Submission
 		return models.SubmissionResponse{}, errors.New("invalid submission")
 	}
 
+	if len(answers) == 0 {
+		// no submission allowed
+		return models.SubmissionResponse{}, errors.New("invalid submission")
+	}
+
 	var correct, incorrect int
 	graded := map[int]bool{}
 	totalQuestions := len(answers)
@@ -74,6 +79,12 @@ func GradeTraining(trainingId int, userUUID string, submission models.Submission
 		NumCorrect:   correct,
 		NumIncorrect: incorrect,
 		Grade:        int((float64(correct) / float64(totalQuestions)) * 100),
+	}
+
+	if training.ShowAnswers {
+		res.GradedResponse = graded
+	} else {
+		res.GradedResponse = map[int]bool{}
 	}
 
 	if passed {

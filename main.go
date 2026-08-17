@@ -104,6 +104,7 @@ func main() {
 	// auth
 	router.GET("/auth/login", auth.HandleLogin)       // This endpoint should match the path for loginURL
 	router.GET("/auth/callback", auth.HandleCallback) // This endpoint should match the path for callbackURL
+	router.POST("/auth/refresh", auth.HandleRefresh)
 	router.GET("/auth/logout", auth.HandleLogout)
 
 	// api
@@ -111,13 +112,13 @@ func main() {
 
 	// frontend
 	if os.Getenv("DEV") == "true" {
-		router.NoRoute(auth.CookieMiddleware(), createViteProxy())
+		router.NoRoute(createViteProxy())
 	} else {
 		gin.SetMode(gin.ReleaseMode)
 
 		router.StaticFS("/assets", http.FS(assetsFS))
 
-		router.NoRoute(auth.CookieMiddleware(), func(c *gin.Context) {
+		router.NoRoute(func(c *gin.Context) {
 			if strings.HasPrefix(c.Request.URL.Path, "/api") {
 				c.JSON(404, gin.H{"error": "not found"})
 				return

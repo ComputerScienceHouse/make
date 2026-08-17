@@ -2,6 +2,7 @@
 import TrainingEditForm from '@/components/TrainingEditForm.vue'
 import type { TrainingFull } from '@/models/trainings'
 import router from '@/router'
+import { apiFetch } from '@/util/fetch'
 import { ref } from 'vue'
 
 const training = ref<TrainingFull>({
@@ -9,11 +10,12 @@ const training = ref<TrainingFull>({
   title: 'New Training',
   description: 'Gets to creating!',
   requiredCorrect: 0,
+  showAnswers: false,
   questions: [],
 })
 
 async function saveTraining(t: TrainingFull) {
-  const res = await fetch(`/api/trainings/`, {
+  const res = await apiFetch(`/api/trainings/`, {
     method: 'POST',
     body: JSON.stringify(t),
     credentials: 'include',
@@ -35,6 +37,28 @@ async function saveTraining(t: TrainingFull) {
       <div class="flex-grow-1 me-3">
         <input type="text" v-model="training.title" class="h1 underline-input" />
         <input type="text" v-model="training.description" class="p underline-input text-muted" />
+                <div class="d-flex mt-2 align-items-center">
+          <div class="me-4">
+            <label class="form-label small">Required Correct Answers</label>
+            <input
+              type="number"
+              min="0"
+              :max="training.questions.length"
+              v-model.number="training.requiredCorrect"
+              class="form-control"
+              style="max-width: 100px"
+            />
+          </div>
+          <div class="form-check form-switch">
+            <input
+              type="checkbox"
+              id="required"
+              class="form-check-input"
+              v-model="training.showAnswers"
+            />
+            <label class="form-check-label small ms-1">Show answers upon completion </label>
+          </div>
+        </div>
       </div>
       <div class="text-end flex-shrink-0">
         <button class="btn btn-primary" @click="saveTraining(training)">Publish</button>
