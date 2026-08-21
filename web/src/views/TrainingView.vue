@@ -228,20 +228,25 @@ function formatAnswer(answer: string | number | boolean | undefined) {
         v-for="(question, index) in training?.questions"
         :key="question.id"
         class="card mb-3 question-review-card shadow-sm"
-        :class="
-          submissionResults.gradedResponse[question.id] ? 'question-correct' : 'question-incorrect'
-        "
+        :class="{
+          'question-correct': submissionResults.gradedResponse[question.id] === true,
+          'question-incorrect': submissionResults.gradedResponse[question.id] === false,
+          'question-unanswered': submissionResults.gradedResponse === undefined
+        }"
       >
         <div class="card-body">
           <div class="d-flex align-items-start gap-3">
             <div class="pt-1">
               <i
                 class="bi"
-                :class="
-                  submissionResults.gradedResponse[question.id]
-                    ? 'bi-check-circle-fill text-success'
-                    : 'bi-x-circle-fill text-danger'
-                "
+                :class="{
+                  'bi-check-circle-fill text-success':
+                    submissionResults.gradedResponse[question.id] === true,
+                  'bi-x-circle-fill text-danger':
+                    submissionResults.gradedResponse[question.id] === false,
+                  'bi-dash-circle-fill text-muted':
+                    submissionResults.gradedResponse[question.id] === undefined
+                }"
               ></i>
             </div>
 
@@ -298,5 +303,10 @@ function formatAnswer(answer: string | number | boolean | undefined) {
 
 .question-incorrect {
   border-left-color: var(--bs-danger);
+}
+
+.question-unanswered {
+  border-left-color: var(--bs-secondary);
+  background-color: var(--bs-secondary-bg);
 }
 </style>
