@@ -41,14 +41,25 @@ func GradeTraining(trainingId int, userUUID string, submission models.Submission
 		return models.SubmissionResponse{}, err
 	}
 
-	//TODO: remove this not needed too lazy rn
-	answers, err := database.Helper.GetTrainingAnswers(trainingId)
-	if err != nil {
-		return models.SubmissionResponse{}, err
-	}
+	var answers map[int]models.Question = map[int]models.Question{}
 
-	if len(answers) != len(submission) {
-		return models.SubmissionResponse{}, errors.New("invalid submission")
+	var correct, incorrect int
+	graded := map[int]bool{}
+	totalQuestions := 0
+
+	for _, q := range training.Questions {
+		answers[q.ID] = q
+
+		if !q.Required {
+			continue
+		}
+
+		_, exists := submission[q.ID]
+		if !exists {
+			return models.SubmissionResponse{}, errors.New("invalid submission")
+		}
+
+		totalQuestions++
 	}
 
 	if len(answers) == 0 {
@@ -56,13 +67,16 @@ func GradeTraining(trainingId int, userUUID string, submission models.Submission
 		return models.SubmissionResponse{}, errors.New("invalid submission")
 	}
 
-	var correct, incorrect int
-	graded := map[int]bool{}
-	totalQuestions := len(answers)
-
 	// grade answers
 	for id, r := range submission {
-		isCorrect := answers[id] == r
+		if !answers[id].Required {
+			continue
+		}
+
+		var isCorrect bool
+
+		isCorrect = answers[id].Answer == r
+
 		graded[id] = isCorrect
 
 		if isCorrect {

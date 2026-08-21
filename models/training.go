@@ -37,7 +37,7 @@ type UserTraining struct {
 	ExpiresAt   time.Time `json:"expiresAt"`
 }
 
-type Submission = map[int]string
+type Submission = map[int]any
 
 type SubmissionResponse struct {
 	Passed         bool         `json:"passed"`
