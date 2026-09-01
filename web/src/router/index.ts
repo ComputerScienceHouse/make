@@ -72,6 +72,10 @@ const router = createRouter({
       meta: { requiresAdmin: true },
     },
     {
+      path: '/auth',
+      redirect: '/',
+    },
+    {
       path: '/:pathMatch(.*)*',
       component: () => import('@/views/NotFoundView.vue'),
     },
