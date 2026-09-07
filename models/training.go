@@ -8,6 +8,7 @@ type Question struct {
 	ID       int      `json:"id"`
 	Label    string   `json:"label"`
 	Required bool     `json:"required,omitempty"`
+	Body     string   `json:"body,omitempty"`
 	Type     string   `json:"type"`
 	Options  []string `json:"options,omitempty"`
 	Answer   any      `json:"answer,omitempty"`

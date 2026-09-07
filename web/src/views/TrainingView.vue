@@ -5,6 +5,7 @@ import type { SubmissionResults, Training, UserTraining } from '@/models/trainin
 import { apiFetch } from '@/util/fetch'
 import { ref, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
+import VueMarkdown from 'vue-markdown-render'
 
 const user = authState.user
 
@@ -120,7 +121,12 @@ function formatAnswer(answer: string | number | boolean | undefined) {
 
     <form @submit.prevent="submitTraining">
       <div v-for="q in training.questions" :key="q.id" class="mb-4 p-3 border rounded shadow-sm">
-        <label :for="`${q.id}`" class="form-label fs-6">
+
+        <div v-if="q.type === 'info' && q.body">  
+          <vue-markdown :source="q.body" />
+        </div>
+
+        <label v-else :for="`${q.id}`" class="form-label fs-6">
           {{ q.label }}
           <span v-if="q.required" class="text-danger">*</span>
         </label>
@@ -155,16 +161,6 @@ function formatAnswer(answer: string | number | boolean | undefined) {
             />
             <label :for="option" class="form-check-label">{{ option }}</label>
           </div>
-        </div>
-
-        <div v-else-if="q.type === 'checkbox'" class="form-check">
-          <input
-            :id="`${q.id}`"
-            v-model="answers[q.id]"
-            type="checkbox"
-            class="form-check-input"
-            :required="q.required"
-          />
         </div>
       </div>
 

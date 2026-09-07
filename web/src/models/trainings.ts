@@ -1,6 +1,7 @@
 type BaseQuestion = {
   id: number
   label: string
+  body?: string
   required?: boolean
 }
 
@@ -21,23 +22,24 @@ export type RadioQuestion = BaseQuestion & {
   options: string[]
 }
 
-export type CheckboxQuestion = BaseQuestion & {
-  type: 'checkbox'
+export type Information = BaseQuestion & {
+  type: 'info'
 }
+
 
 export type Question =
   | TextQuestion
   | BigTextQuestion
   | NumberQuestion
   | RadioQuestion
-  | CheckboxQuestion
+  | Information
 
 export type QuestionWithAnswer =
   | (TextQuestion & { answer: string })
   | (BigTextQuestion & { answer: string })
   | (NumberQuestion & { answer: number })
   | (RadioQuestion & { answer: string })
-  | (CheckboxQuestion & { answer: boolean })
+  | (Information & { answer: string})
 
 export interface Training {
   id: number

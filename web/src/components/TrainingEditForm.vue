@@ -13,7 +13,7 @@ function deleteQuestion(index: number) {
   training.value.questions.splice(index, 1)
 }
 
-function addOptionToRadioQuestion(question: RadioQuestion) {
+function addOptionToQuestion(question: RadioQuestion) {
   question.options.push('New Option')
 }
 
@@ -40,8 +40,11 @@ function changeQuestionToDifferentType(
     case 'radio':
       return { ...base, type: 'radio', options: ['New Option'], answer: 'New Option' }
 
-    case 'checkbox':
-      return { ...base, type: 'checkbox', answer: true }
+    case 'info':
+      return { ...base, type: 'info', answer: '', body: "Type markdown formatted text here!", required: false}
+
+    default:
+      throw new Error(`Unknown question type: ${newType}`)
   }
 }
 
@@ -68,7 +71,8 @@ function addQuestion() {
       class="mb-4 p-3 border rounded shadow-sm d-flex justify-content-between"
     >
       <div>
-        <label :for="`${q.id}`" class="form-label fs-6">
+
+        <label v-if="q.type !== 'info'" :for="`${q.id}`" class="form-label fs-6">
           <input type="text" v-model="q.label" class="underline-input" />
           <span v-if="q.required" class="text-danger">*</span>
         </label>
@@ -105,16 +109,22 @@ function addQuestion() {
             </label>
           </div>
 
-          <button class="btn btn-bg p-0 m-0 mt-3" @click="addOptionToRadioQuestion(q)">
+          <button class="btn btn-bg p-0 m-0 mt-3" @click="addOptionToQuestion(q)">
             <i class="bi bi-plus-lg"></i>
             Add Option
           </button>
         </div>
 
-        <div v-else-if="q.type === 'checkbox'" class="form-check">
-          <input :id="`${q.id}`" v-model="q.answer" type="checkbox" class="form-check-input" />
-        </div>
+
+        <textarea
+          v-if="q.type === 'info'"
+          :id="`${q.id}`"
+          v-model="q.body"
+          class="form-control"
+        ></textarea>
       </div>
+
+      
 
       <!-- Right side -->
       <div>
@@ -129,6 +139,7 @@ function addQuestion() {
           <option value="radio">Multiple Choice</option>
           <option value="textarea">Text</option>
           <option value="number">Number</option>
+          <option value="info">Info</option>
         </select>
 
         <div class="form-check mt-2">
