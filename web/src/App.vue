@@ -2,7 +2,20 @@
 import { RouterView } from 'vue-router'
 import AppNavbar from '@/components/AppNavbar.vue'
 import AppFooter from './components/AppFooter.vue'
+
+const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)')
+
+function updateTheme() {
+  document.documentElement.setAttribute(
+    'data-bs-theme',
+    mediaQuery.matches ? 'dark' : 'light'
+  )
+}
+
+updateTheme()
+mediaQuery.addEventListener('change', updateTheme)
 </script>
+
 
 <template>
   <AppNavbar />
