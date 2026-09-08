@@ -1,5 +1,5 @@
 <script setup lang="ts">
-const version = git_describe
+const version = import.meta.env.VITE_GIT_DESCRIBE
 const year = new Date().getFullYear()
 </script>
 
