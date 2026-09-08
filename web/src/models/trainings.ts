@@ -26,20 +26,14 @@ export type Information = BaseQuestion & {
   type: 'info'
 }
 
-
-export type Question =
-  | TextQuestion
-  | BigTextQuestion
-  | NumberQuestion
-  | RadioQuestion
-  | Information
+export type Question = TextQuestion | BigTextQuestion | NumberQuestion | RadioQuestion | Information
 
 export type QuestionWithAnswer =
   | (TextQuestion & { answer: string })
   | (BigTextQuestion & { answer: string })
   | (NumberQuestion & { answer: number })
   | (RadioQuestion & { answer: string })
-  | (Information & { answer: string})
+  | (Information & { answer: string })
 
 export interface Training {
   id: number

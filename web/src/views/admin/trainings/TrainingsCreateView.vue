@@ -37,7 +37,7 @@ async function saveTraining(t: TrainingFull) {
       <div class="flex-grow-1 me-3">
         <input type="text" v-model="training.title" class="h1 underline-input" />
         <input type="text" v-model="training.description" class="p underline-input text-muted" />
-                <div class="d-flex mt-2 align-items-center">
+        <div class="d-flex mt-2 align-items-center">
           <div class="me-4">
             <label class="form-label small">Required Correct Answers</label>
             <input

@@ -41,7 +41,13 @@ function changeQuestionToDifferentType(
       return { ...base, type: 'radio', options: ['New Option'], answer: 'New Option' }
 
     case 'info':
-      return { ...base, type: 'info', answer: '', body: "Type markdown formatted text here!", required: false}
+      return {
+        ...base,
+        type: 'info',
+        answer: '',
+        body: 'Type markdown formatted text here!',
+        required: false,
+      }
 
     default:
       throw new Error(`Unknown question type: ${newType}`)
@@ -71,7 +77,6 @@ function addQuestion() {
       class="mb-4 p-3 border rounded shadow-sm d-flex justify-content-between"
     >
       <div>
-
         <label v-if="q.type !== 'info'" :for="`${q.id}`" class="form-label fs-6">
           <input type="text" v-model="q.label" class="underline-input" />
           <span v-if="q.required" class="text-danger">*</span>
@@ -115,7 +120,6 @@ function addQuestion() {
           </button>
         </div>
 
-
         <textarea
           v-if="q.type === 'info'"
           :id="`${q.id}`"
@@ -123,8 +127,6 @@ function addQuestion() {
           class="form-control"
         ></textarea>
       </div>
-
-      
 
       <!-- Right side -->
       <div>

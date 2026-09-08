@@ -121,8 +121,7 @@ function formatAnswer(answer: string | number | boolean | undefined) {
 
     <form @submit.prevent="submitTraining">
       <div v-for="q in training.questions" :key="q.id" class="mb-4 p-3 border rounded shadow-sm">
-
-        <div v-if="q.type === 'info' && q.body">  
+        <div v-if="q.type === 'info' && q.body">
           <vue-markdown :source="q.body" />
         </div>
 
@@ -227,7 +226,7 @@ function formatAnswer(answer: string | number | boolean | undefined) {
         :class="{
           'question-correct': submissionResults.gradedResponse[question.id] === true,
           'question-incorrect': submissionResults.gradedResponse[question.id] === false,
-          'question-unanswered': submissionResults.gradedResponse === undefined
+          'question-unanswered': submissionResults.gradedResponse === undefined,
         }"
       >
         <div class="card-body">
@@ -241,7 +240,7 @@ function formatAnswer(answer: string | number | boolean | undefined) {
                   'bi-x-circle-fill text-danger':
                     submissionResults.gradedResponse[question.id] === false,
                   'bi-dash-circle-fill text-muted':
-                    submissionResults.gradedResponse[question.id] === undefined
+                    submissionResults.gradedResponse[question.id] === undefined,
                 }"
               ></i>
             </div>
