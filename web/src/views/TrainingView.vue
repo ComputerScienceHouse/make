@@ -148,7 +148,7 @@ function formatAnswer(answer: string | number | boolean | undefined) {
         />
 
         <div v-else-if="q.type == 'radio'">
-          <div v-for="option in q.options" :key="option" class="form-check">
+          <div v-for="option in q.options" :key="option" class="form-check d-flex">
             <input
               type="radio"
               :id="option"
