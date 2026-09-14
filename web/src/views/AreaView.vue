@@ -227,7 +227,7 @@ onMounted(async () => {
 
 .training-link {
   text-decoration: none;
-  color: var(--bs-dark);
+  color: var(--bs-body-color);
 }
 
 .training-link:hover {

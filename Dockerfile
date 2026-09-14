@@ -5,13 +5,13 @@ WORKDIR /app
 
 RUN apk add --no-cache git
 COPY web/package*.json ./
-COPY .git .
+COPY .git ./.git
 
 RUN npm ci
 
 COPY web/ .
 
-RUN GIT_DESCRIBE="$(git describe --always --dirty --tags 2>/dev/null || echo unknown)" \
+RUN export VITE_GIT_DESCRIBE="$(git describe --always --dirty --tags 2>/dev/null || echo unknown)" && \
     npm run build
 
 

@@ -59,7 +59,7 @@ onMounted(async () => {
   <main class="container" v-else>
     <div class="d-flex justify-content-between align-items-center">
       <h1>Resources:</h1>
-      <RouterLink to="/admin/areas/create" type="button" class="btn btn-primary">Create</RouterLink>
+      <RouterLink to="/admin/resources/create" type="button" class="btn btn-primary">Create</RouterLink>
     </div>
 
     <DynamicTable :data="resources" :options="tableOptions"></DynamicTable>

@@ -164,7 +164,7 @@ func (database *DatabaseHelper) GetTraining(trainingID int, includeAnswers bool)
 	}
 
 	query = `SELECT
-                q.id, q.label, q.type, q.answer, q.required,
+                q.id, q.label, q.type, q.answer, q.required, q.body,
                 o.label
         FROM training_questions q
         LEFT JOIN question_options o ON o.question_id = q.id
@@ -172,6 +172,9 @@ func (database *DatabaseHelper) GetTraining(trainingID int, includeAnswers bool)
         ORDER BY q.id, o.id;`
 
 	qRows, err := database.DB.Query(query, training.ID)
+	if err != nil {
+		return training, err
+	}
 
 	for qRows.Next() {
 		var question models.Question
@@ -183,6 +186,7 @@ func (database *DatabaseHelper) GetTraining(trainingID int, includeAnswers bool)
 			&question.Type,
 			&question.Answer,
 			&question.Required,
+			&question.Body,
 
 			&option,
 		)
@@ -247,7 +251,7 @@ func (database *DatabaseHelper) CreateTraining(training models.CreateTrainingReq
 
 	var trainingId int
 	err = tx.QueryRow(
-		"INSERT INTO trainings (title, required_correct, description, showAnswers) VALUES ($1, $2, $3, $4) RETURNING id",
+		"INSERT INTO trainings (title, required_correct, description, show_answers) VALUES ($1, $2, $3, $4) RETURNING id",
 		training.Title,
 		training.RequiredCorrect,
 		training.Description,
@@ -261,12 +265,13 @@ func (database *DatabaseHelper) CreateTraining(training models.CreateTrainingReq
 	for _, q := range training.Questions {
 		var questionId int
 		err = tx.QueryRow(
-			"INSERT INTO training_questions (training_id, label, type, answer, required) VALUES ($1, $2, $3, $4, $5) RETURNING id",
+			"INSERT INTO training_questions (training_id, label, type, answer, required, body) VALUES ($1, $2, $3, $4, $5, $6) RETURNING id",
 			trainingId,
 			q.Label,
 			q.Type,
 			q.Answer,
 			q.Required,
+			q.Body,
 		).Scan(&questionId)
 
 		if err != nil {
@@ -325,12 +330,13 @@ func (database *DatabaseHelper) UpdateTraining(training models.CreateTrainingReq
 	for _, q := range training.Questions {
 		var questionId int
 		err = tx.QueryRow(
-			"INSERT INTO training_questions (training_id, label, type, answer, required) VALUES ($1, $2, $3, $4, $5) RETURNING id",
+			"INSERT INTO training_questions (training_id, label, type, answer, required, body) VALUES ($1, $2, $3, $4, $5, $6) RETURNING id",
 			trainingId,
 			q.Label,
 			q.Type,
 			q.Answer,
 			q.Required,
+			q.Body,
 		).Scan(&questionId)
 
 		if err != nil {
